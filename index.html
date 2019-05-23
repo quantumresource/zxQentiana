@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        window.languagePluginUrl = 'http://localhost:8000/pyodide/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
+    </script>
+    <script src="pyodide/pyodide.js"></script>
+</head>
+<body>
+  Pyodide test page <br>
+  Open your browser console to see pyodide output
+  <script type="text/javascript">
+        languagePluginLoader.then(function () {
+            console.log(pyodide.runPython('import sys\nsys.version'));
+            console.log(pyodide.runPython('help("modules")'));
+            pyodide.loadPackage('http://localhost:8000/pyodide_zx/pyzx.js').then(() => {
+              // somehow this still doesn't work
+              //console.log(pyodide.runPython(""))
+              });
+        });
+  </script>
+</body>
