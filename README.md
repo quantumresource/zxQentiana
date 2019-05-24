@@ -1,6 +1,12 @@
-# zxQentiana
+# pyZX + Qentiana = zxQentiana
 
-A library that combines the resource estimation methods from Qentiana with the circuit optimization techniques from the ZX-calculus.
+Browser based tool for resource estimating quantum circuits processed by pyZX
+
+- Visualise zx diagrams
+- (Manipulate zx diagrams)
+- Resource estimate with different scenarios (error rate, cycle time)
+- Plot comparisons between estimation scenarios
+- Download CSV data
 
 Each individual project can be found on their respective github repositories:
 
