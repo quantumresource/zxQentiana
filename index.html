@@ -12,7 +12,7 @@
   <script type="text/javascript">
         languagePluginLoader.then(function () {
             console.log(pyodide.runPython('import sys\nsys.version'));
-            console.log(pyodide.runPython('help("modules")'));
+            //console.log(pyodide.runPython('help("modules")'));
             pyodide.loadPackage('http://localhost:8000/pyodide_zx/pyzx.js').then(() => {
               // somehow this still doesn't work
               //console.log(pyodide.runPython(""))
