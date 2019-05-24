@@ -2,9 +2,9 @@
 <html>
 <head>
     <script type="text/javascript">
-        window.languagePluginUrl = 'http://localhost:8000/pyodide/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
+        window.languagePluginUrl = 'http://localhost:8000/website_files/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
     </script>
-    <script src="pyodide/pyodide.js"></script>
+    <script src="website_files/pyodide.js"></script>
 </head>
 <body>
   Pyodide test page <br>
@@ -13,9 +13,9 @@
         languagePluginLoader.then(function () {
             console.log(pyodide.runPython('import sys\nsys.version'));
             //console.log(pyodide.runPython('help("modules")'));
-            pyodide.loadPackage('http://localhost:8000/pyodide_zx/pyzx.js').then(() => {
+            pyodide.loadPackage('pyzx').then(() => {
               // somehow this still doesn't work
-              //console.log(pyodide.runPython(""))
+              console.log(pyodide.runPython(""))
               });
         });
   </script>

@@ -16,11 +16,12 @@ Each individual project can be found on their respective github repositories:
 The calculations are performed inside the browser without the need to install python or use a server that runs python. This is enabled by the Pyodide package that bring the python scientific stack to the browser [see Github](https://github.com/iodide-project/pyodide).
 
 ## Installation
-For compilation and development the following (common) packages are required:
+For compilation and development the following packages are required:
 
 - python 3
 - wget
 - git
+- pyodide (halfway compiled): The address in the makefile needs to be adjusted to point to the pyodide directory. Get it from [Github](git@github.com:iodide-project/pyodide.git)
 
 The Makefile automatically downloads the remaining dependencies and creates the folder 'website_files' that needs to be hostet on a website:
 ```

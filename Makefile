@@ -2,22 +2,22 @@
 # python 2 is not supported
 export PYTHON = python3
 
+# either absolute path or relative path with additional ../ because it is called in a subdirectory
+export PYODIDE_PATH = ../../pyodide
+
 
 .PHONY: all clean serve pyodide_zx
 
 all: website_files/packages.json pyodide_build/pyodide.js pyodide_zx/pyzx.data
 
-pyodide/tools/file_packager.py:
-	git clone https://github.com/iodide-project/pyodide.git
-
 
 website_files/packages.json: pyodide_build/pyodide.js pyodide_zx/pyzx.data
 	mkdir -p website_files
 	cp pyodide_build/* website_files
-	cp pyodide_zx/pyzx.data pyodide_zx/pyzx.js website_files
+	cp pyodide_zx/packages.json pyodide_zx/pyzx.data pyodide_zx/pyzx.js website_files
 
 
-pyodide_zx/pyzx.data: pyodide/tools/file_packager.py
+pyodide_zx/pyzx.data: pyodide_zx/Makefile
 	$(MAKE) -C pyodide_zx
 
 pyodide_build/pyodide.js:
@@ -27,9 +27,8 @@ pyodide_build/pyodide.js:
 	rm pyodide-build-0.12.0.tar.bz2
 
 serve:
-	#$(PYTHON) -m http.server
 	$(PYTHON) run_website.py
 
 clean:
-	rm -r pyodide_build pyodide website_files
 	$(MAKE) -C pyodide_zx clean
+	rm -r pyodide_build website_files

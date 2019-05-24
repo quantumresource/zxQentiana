@@ -1,6 +1,3 @@
-PYODIDE_PATH=../pyodide
-
-
 .PHONY: all clean
 all: pyzx.js
 
