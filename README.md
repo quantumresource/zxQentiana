@@ -8,6 +8,8 @@ Browser based tool for resource estimating quantum circuits processed by pyZX
 - Plot comparisons between estimation scenarios
 - Download CSV data
 
+<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ3ikcnnLrruod0jHAHC5e-jBfwnwE07iwuUVT642E44odPCaa626p1jrFPPDV1ZJhOSM4y2R3dZjfR/embed?start=true&loop=true&delayms=10000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+
 Each individual project can be found on their respective github repositories:
 
 - PyZX: [Github](https://github.com/Quantomatic/pyzx) [Demo](http://zxcalculus.com/pyzx.html)
