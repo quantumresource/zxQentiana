@@ -11,11 +11,8 @@
   Open your browser console to see pyodide output
   <script type="text/javascript">
         languagePluginLoader.then(function () {
-            console.log(pyodide.runPython('import sys\nsys.version'));
-            //console.log(pyodide.runPython('help("modules")'));
-            pyodide.loadPackage('pyzx').then(() => {
-              // somehow this still doesn't work
-              console.log(pyodide.runPython(""))
+            pyodide.loadPackage(['pyzx']).then(() => {
+              console.log(pyodide.runPython('import pyzx'));
               });
         });
   </script>
