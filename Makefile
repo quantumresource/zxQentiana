@@ -3,7 +3,13 @@
 export PYTHON = python3
 
 # either absolute path or relative path with additional ../ because it is called in a subdirectory
-export PYODIDE_PATH = ../../pyodide
+# the path to the local git repo of pyodide
+# we do not compile it, but use tools from the repo
+# the compiled version is downloaded...see belowa
+export PYODIDE_PATH = /home/alexandru/pyodide
+
+# from where should the pyodide build be downloaded?
+export PYODIDE_BUILD = https://github.com/iodide-project/pyodide/releases/download/0.13.0/pyodide-build-0.13.0.tar.bz2
 
 
 .PHONY: all clean serve pyodide_zx
@@ -23,10 +29,16 @@ pyodide_zx/pyzx.data: pyodide_zx/Makefile
 	$(MAKE) -C pyodide_zx
 
 pyodide_build/pyodide.js:
-	wget https://github.com/iodide-project/pyodide/releases/download/0.12.0/pyodide-build-0.12.0.tar.bz2
 	mkdir -p pyodide_build
-	tar -C pyodide_build/ -xvf pyodide-build-0.12.0.tar.bz2
-	rm pyodide-build-0.12.0.tar.bz2
+	# if wget fails, the download should be rm-ed
+	wget $(PYODIDE_BUILD) --output-document pyodide_build.tar.bz2
+	#if [ $? -ne 0 ]
+  	#	then echo "--> Wget failed"
+  	#	else echo "--> Wget OK"
+	#fi
+
+	tar -C pyodide_build/ -xvf pyodide_build.tar.bz2
+	rm pyodide_build.tar.bz2
 
 qentiana_build/cube_to_physical.js: qentiana_build/Makefile
 	$(MAKE) -C qentiana_build

@@ -23,7 +23,13 @@ For compilation and development the following packages are required:
 - python 3
 - wget
 - git
-- pyodide (halfway compiled): The address in the makefile needs to be adjusted to point to the pyodide directory. Get it from [Github](git@github.com:iodide-project/pyodide.git)
+- pyodide 
+
+Pyodide is used in two forms:
+- source code from [Github](git@github.com:iodide-project/pyodide.git)
+- built version that is automatically downloade by our Makefile
+
+Edit the PYODIDE_PATH from the Makefile to the path where the git repo was clone. Prefer absolute path.
 
 The Makefile automatically downloads the remaining dependencies and creates the folder 'website_files' that needs to be hostet on a website:
 ```
