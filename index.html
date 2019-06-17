@@ -10,7 +10,7 @@
 <body>
   <div style="width: 40%; float:left; height:400px; background:lightcoral; margin:10px">
     <textarea rows="4" id="txt_script" style="width:90%; height:90%">
-import pyzx
+import pyzx as zx
 
 import cube_to_physical as qre
       
@@ -27,6 +27,21 @@ estimation = "Resource prediction phys. qubits, time, t_count, time, log_qub: " 
 #print estimation
 cons = document.getElementById("txt_console")
 cons.innerText = estimation
+
+#
+# PyZX part
+#
+qubit_amount = 5
+gate_count = 80
+#Generate random circuit of Clifford gates
+circuit = zx.generate.cliffordT(qubit_amount, gate_count)
+#If running in Jupyter, draw the circuit
+#zx.draw(circuit)
+#Use one of the built-in rewriting strategies to simplify the circuit
+zx.simplify.full_reduce(circuit)
+#See the result
+#zx.draw(circuit)
+cons.innerText += zx.Circuit.from_graph(circuit).to_qasm()
     </textarea>
     <br>
     <input type="button" value="Run the Python" id="btnrun" onclick="runscript()">
