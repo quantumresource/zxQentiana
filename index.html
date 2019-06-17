@@ -1,19 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8"/>
     <script type="text/javascript">
-        window.languagePluginUrl = 'http://localhost:8000/website_files/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
+        window.languagePluginUrl = 'website_files/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
     </script>
     <script src="website_files/pyodide.js"></script>
 </head>
 <body>
-  Pyodide test page <br>
-  Open your browser console to see pyodide output
+  <div style="width: 40%; float:left; height:400px; background:lightcoral; margin:10px">
+    <textarea rows="4" id="txt_script" style="width:90%; height:90%">
+import pyzx
+
+import cube_to_physical as qre
+      
+from js import document
+
+# parameters
+t_count = 100
+max_log_qubits = 200
+# estimate the resources
+qentiana = qre.Qentiana(t_count, max_log_qubits)
+res_values = qentiana.compute_physical_resources()
+estimation = "Resource prediction phys. qubits, time, t_count, time, log_qub: " + str(res_values)
+
+#print estimation
+cons = document.getElementById("txt_console")
+cons.innerText = estimation
+    </textarea>
+    <br>
+    <input type="button" value="Run the Python" id="btnrun" onclick="runscript()">
+  </div>
+
+  <div style="width: 40%; float:left; height:400px; background:rgb(203, 219, 182); margin:10px" id="txt_console">
+  </div>
+
   <script type="text/javascript">
-        languagePluginLoader.then(function () {
-            pyodide.loadPackage(['pyzx']).then(() => {
-              console.log(pyodide.runPython('import pyzx'));
-              });
+    languagePluginLoader.then(function () {
+            pyodide.loadPackage(['pyzx', 'cube_to_physical']);
         });
+
+    function py (code)
+    {
+      return pyodide.runPython(code);
+    }
+
+    function runscript()
+    {
+      //read script
+      scriptLines = document.getElementById("txt_script").value;
+      //run script
+      py(scriptLines);
+    }
   </script>
 </body>
