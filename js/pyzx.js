@@ -1,20 +1,25 @@
+function pyZXJavaScript()
+{
+    //a class to encapsulate
+}
+
 // styling functions
-function nodeColor(t) {
+pyZXJavaScript.prototype.nodeColor = function(t) {
     if (t == 0) return "black";
     else if (t == 1) return "green";
     else if (t == 2) return "red";
 }
 
-function edgeColor(t) {
+pyZXJavaScript.prototype.edgeColor = function(t) {
     if (t == 1) return "black";
     else if (t == 2) return "#08f";
 }
 
-function nodeStyle(selected) {
+pyZXJavaScript.prototype.nodeStyle = function(selected) {
     return selected ? "stroke-width: 2px; stroke: #00f" : "stroke-width: 1.5px";
 }
 
-function showGraph(tag, graphs, width, height, node_size) {
+pyZXJavaScript.prototype.showGraph = function(tag, graphs, width, height, node_size) {
     var ntab = {};
 
     graph = JSON.parse(graphs)
@@ -31,6 +36,9 @@ function showGraph(tag, graphs, width, height, node_size) {
         d.source = ntab[d.source];
         d.target = ntab[d.target];
     });
+
+    //to keep the reference to the object?
+    var refthis = this;
 
     var shiftKey;
 
@@ -55,7 +63,7 @@ function showGraph(tag, graphs, width, height, node_size) {
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; })
-        .attr("stroke", function(d) { return edgeColor(d.t); })
+        .attr("stroke", function(d) { return refthis.edgeColor(d.t); })
         .attr("style", "stroke-width: 1.5px");
 
     var brush = svg.append("g")
@@ -72,7 +80,7 @@ function showGraph(tag, graphs, width, height, node_size) {
         })
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
-        .attr("fill", function(d) { return nodeColor(d.t); })
+        .attr("fill", function(d) { return refthis.nodeColor(d.t); })
         .attr("stroke", "black");
 
     var text = svg.selectAll("text")
@@ -91,10 +99,10 @@ function showGraph(tag, graphs, width, height, node_size) {
 
     node.on("mousedown", function(d) {
             if (shiftKey) {
-                d3.select(this).attr("style", nodeStyle(d.selected = !d.selected));
+                d3.select(this).attr("style", refthis.nodeStyle(d.selected = !d.selected));
                 d3.event.stopImmediatePropagation();
             } else if (!d.selected) {
-                node.attr("style", function(p) { return nodeStyle(p.selected = d === p); });
+                node.attr("style", function(p) { return refthis.nodeStyle(p.selected = d === p); });
             }
         })
         .call(d3.drag().on("drag", function(d) {
@@ -122,7 +130,7 @@ function showGraph(tag, graphs, width, height, node_size) {
         .on("start", function() {
             if (d3.event.sourceEvent.type !== "end") {
                 node.attr("style", function(d) {
-                    return nodeStyle(
+                    return refthis.nodeStyle(
                         d.selected = d.previouslySelected = shiftKey &&
                         d.selected);
                 });
@@ -132,7 +140,7 @@ function showGraph(tag, graphs, width, height, node_size) {
             if (d3.event.sourceEvent.type !== "end") {
                 var selection = d3.event.selection;
                 node.attr("style", function(d) {
-                    return nodeStyle(d.selected = d.previouslySelected ^
+                    return refthis.nodeStyle(d.selected = d.previouslySelected ^
                         (selection != null
                         && selection[0][0] <= d.x && d.x < selection[1][0]
                         && selection[0][1] <= d.y && d.y < selection[1][1]));

@@ -7,9 +7,12 @@
     </script>
     <script src="githubiofiles/pyodide.js"></script>
 
-    <!-- <script src="js/require.js"></script> -->
     <script src="js/d3.v4.min.js"></script>
     <script src="js/pyzx.js"></script>
+
+    <script>
+      pyZXJS = new pyZXJavaScript();
+    </script>
 
 </head>
 <body>
@@ -26,8 +29,9 @@ import cube_to_physical as qre
 
 # https://github.com/iodide-project/pyodide/blob/master/docs/type_conversions.md#using-javascript-objects-from-python
 from js import document
-from js import showGraph
+from js import pyZXJS
 
+# get DOM elements
 cons = document.getElementById("txt_console")
 figcircuit = document.getElementById("fig_circuit")
 
@@ -70,9 +74,7 @@ def draw(g, where, scale=None):
     
     graphj = json.dumps({'nodes': nodes, 'links': links})
 
-    # where.innerText = graphj
-
-    showGraph('#graph-output-1', graphj, w, h, node_size)
+    pyZXJS.showGraph('#graph-output-1', graphj, w, h, node_size)
 
 #
 # PyZX part
@@ -108,6 +110,10 @@ cons.innerText += estimation
   </div>
 
   <div style="width: 90%; float:left; height:400px; background:lightskyblue; margin:10px" id="fig_circuit">
+    <p>
+        Click and drag the nodes.
+    </p>
+    <br>
     <div id="graph-output-1" style="overflow:auto"></div>
   </div>
 
