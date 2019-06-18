@@ -14,8 +14,12 @@ function nodeStyle(selected) {
     return selected ? "stroke-width: 2px; stroke: #00f" : "stroke-width: 1.5px";
 }
 
-function showGraph(tag, graph, width, height, node_size) {
+function showGraph(tag, graphs, width, height, node_size) {
     var ntab = {};
+
+    graph = JSON.parse(graphs)
+
+    // console.log(graph);
 
     graph.nodes.forEach(function(d) {
         ntab[d.name] = d;

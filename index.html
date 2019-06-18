@@ -15,24 +15,28 @@
 <body>
   <div style="width: 40%; float:left; height:400px; background:lightcoral; margin:10px">
     <textarea rows="4" id="txt_script" style="width:90%; height:90%">
-import pyzx as zx
+import json
+from fractions import Fraction
 
+import pyzx as zx
 import cube_to_physical as qre
 
+# https://github.com/iodide-project/pyodide/blob/master/docs/type_conversions.md#using-javascript-objects-from-python
 from js import document
-
-import json
+from js import showGraph
 
 cons = document.getElementById("txt_console")
 figcircuit = document.getElementById("fig_circuit")
 
 def phase_to_s(a):
-    # hard coded
-    ns = 1
-    ds = 2
+    if not a: return ''
+    if not isinstance(a, Fraction):
+        a = Fraction(a)
+    ns = '' if a.numerator == 1 else str(a.numerator)
+    ds = '' if a.denominator == 1 else '/' + str(a.denominator)
 
     # unicode 0x03c0 = pi
-    return str(ns) + '\u03c0' + str(ds)
+    return ns + '\u03c0' + ds
 
 def draw(g, where, scale=None):
     if not hasattr(g, 'vertices'):
@@ -60,11 +64,12 @@ def draw(g, where, scale=None):
     links = [{'source': str(g.edge_s(e)),
               'target': str(g.edge_t(e)),
               't': g.edge_type(e) } for e in g.edges()]
+    
     graphj = json.dumps({'nodes': nodes, 'links': links})
 
-    where.innerText = graphj
+    # where.innerText = graphj
 
-    #pyzx.showGraph('#graph-output-1', graphj, w, h, node_size)
+    showGraph('#graph-output-1', graphj, w, h, node_size)
 
 #
 # PyZX part
@@ -103,15 +108,8 @@ cons.innerText += estimation
   <div style="width: 40%; float:left; height:400px; background:rgb(203, 219, 182); margin:10px" id="txt_console">
   </div>
 
-  <div style="width: 40%; float:left; height:400px; background:lightskyblue; margin:10px" id="fig_circuit">
+  <div style="width: 90%; float:left; height:400px; background:lightskyblue; margin:10px" id="fig_circuit">
     <div id="graph-output-1" style="overflow:auto"></div>
-    <script>
-    function reload_d3()
-    {
-      
-      showGraph('#graph-output-1', graphj, w, h, node_size)
-    }
-    </script>
   </div>
 
   <script type="text/javascript">
