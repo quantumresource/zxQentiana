@@ -1,5 +1,7 @@
 # pyZX + Qentiana = zxQentiana
 
+[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
+
 Browser based tool for resource estimating quantum circuits processed by pyZX
 
 - Visualise zx diagrams
