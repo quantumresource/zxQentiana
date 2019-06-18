@@ -13,6 +13,9 @@
 
 </head>
 <body>
+    <div style="width: 90%; float:left; background:lightskyblue; margin:10px" id="fig_circuit">
+        zxQentiana <a target="_blank" href="https://github.com/quantumresource/zxQentiana">Github repository</a>
+    </div>
   <div style="width: 40%; float:left; height:400px; background:lightcoral; margin:10px">
     <textarea rows="4" id="txt_script" style="width:90%; height:90%">
 import json
@@ -74,35 +77,31 @@ def draw(g, where, scale=None):
 #
 # PyZX part
 #
-qubit_amount = 5
+qubit_amount = 10
 gate_count = 80
+
 #Generate random circuit of Clifford gates
 circuit = zx.generate.cliffordT(qubit_amount, gate_count)
-#If running in Jupyter, draw the circuit
-# r = zx.draw(circuit)
-
-draw(circuit, figcircuit)
 
 #Use one of the built-in rewriting strategies to simplify the circuit
 zx.simplify.full_reduce(circuit)
-#See the result
-#zx.draw(circuit)
-cons.innerText += "T gates from pyZX " + str(zx.tcount(circuit)) + " " + str(circuit.qubit_count())
+draw(circuit, figcircuit)
 
-# parameters
+# Some information from the circuit
 t_count = zx.tcount(circuit)
-max_log_qubits = 200
+max_log_qubits = circuit.qubit_count()
+cons.innerText += "T gates from pyZX " + str(t_count) + " " + str(max_log_qubits)
 # estimate the resources
 qentiana = qre.Qentiana(t_count, max_log_qubits)
 res_values = qentiana.compute_physical_resources()
-estimation = "\nResource prediction phys. qubits, time, t_count, time, log_qub: " + str(res_values)
+estimation = "\nResource prediction (phys. qubits, time): " + str(res_values)
 
 #print estimation
 cons.innerText += estimation
 
     </textarea>
     <br>
-    <input type="button" value="Run the Python" id="btnrun" onclick="runscript()">
+    <input type="button" value="zxQentiana in Action" id="btnrun" onclick="runscript()">
   </div>
 
   <div style="width: 40%; float:left; height:400px; background:rgb(203, 219, 182); margin:10px" id="txt_console">
