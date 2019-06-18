@@ -6,6 +6,11 @@
         window.languagePluginUrl = 'githubiofiles/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
     </script>
     <script src="githubiofiles/pyodide.js"></script>
+
+    <!-- <script src="js/require.js"></script> -->
+    <script src="js/d3.v4.min.js"></script>
+    <script src="js/pyzx.js"></script>
+
 </head>
 <body>
   <div style="width: 40%; float:left; height:400px; background:lightcoral; margin:10px">
@@ -13,10 +18,53 @@
 import pyzx as zx
 
 import cube_to_physical as qre
-      
+
 from js import document
 
+import json
+
 cons = document.getElementById("txt_console")
+figcircuit = document.getElementById("fig_circuit")
+
+def phase_to_s(a):
+    # hard coded
+    ns = 1
+    ds = 2
+
+    # unicode 0x03c0 = pi
+    return str(ns) + '\u03c0' + str(ds)
+
+def draw(g, where, scale=None):
+    if not hasattr(g, 'vertices'):
+        g = g.to_graph()
+
+    if scale == None:
+      scale = 800 / (g.depth() + 2)
+      if scale > 50: scale = 50
+      if scale < 20: scale = 20
+
+    node_size = 0.2 * scale
+    if node_size < 2: node_size = 2
+
+    node_size = 5
+
+    w = (g.depth() + 2) * scale
+    h = (g.qubit_count() + 3) * scale
+
+    nodes = [{'name': str(v),
+              'x': (g.row(v) + 1) * scale,
+              'y': (g.qubit(v) + 2) * scale,
+              't': g.type(v),
+              'phase': phase_to_s(g.phase(v)) }
+             for v in g.vertices()]
+    links = [{'source': str(g.edge_s(e)),
+              'target': str(g.edge_t(e)),
+              't': g.edge_type(e) } for e in g.edges()]
+    graphj = json.dumps({'nodes': nodes, 'links': links})
+
+    where.innerText = graphj
+
+    #pyzx.showGraph('#graph-output-1', graphj, w, h, node_size)
 
 #
 # PyZX part
@@ -26,12 +74,15 @@ gate_count = 80
 #Generate random circuit of Clifford gates
 circuit = zx.generate.cliffordT(qubit_amount, gate_count)
 #If running in Jupyter, draw the circuit
-#zx.draw(circuit)
+# r = zx.draw(circuit)
+
+draw(circuit, figcircuit)
+
 #Use one of the built-in rewriting strategies to simplify the circuit
 zx.simplify.full_reduce(circuit)
 #See the result
 #zx.draw(circuit)
-cons.innerText += "T gates from pyZX " + str(zx.tcount(circuit))
+cons.innerText += "T gates from pyZX " + str(zx.tcount(circuit)) + " " + str(circuit.qubit_count())
 
 # parameters
 t_count = zx.tcount(circuit)
@@ -50,6 +101,17 @@ cons.innerText += estimation
   </div>
 
   <div style="width: 40%; float:left; height:400px; background:rgb(203, 219, 182); margin:10px" id="txt_console">
+  </div>
+
+  <div style="width: 40%; float:left; height:400px; background:lightskyblue; margin:10px" id="fig_circuit">
+    <div id="graph-output-1" style="overflow:auto"></div>
+    <script>
+    function reload_d3()
+    {
+      
+      showGraph('#graph-output-1', graphj, w, h, node_size)
+    }
+    </script>
   </div>
 
   <script type="text/javascript">
