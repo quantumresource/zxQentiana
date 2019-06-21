@@ -1,4 +1,4 @@
-function Loewenzahn(name, vis_options, estimation_method) {
+function Loewenzahn(name, vis_options) {
     /*
         Parameters
     */
@@ -11,8 +11,6 @@ function Loewenzahn(name, vis_options, estimation_method) {
     this.plot_name = name;
     //
     this.options = vis_options;
-    //
-    this.estimation_method = estimation_method;
     //
     var ref = this;
 
@@ -62,8 +60,7 @@ Loewenzahn.prototype.total_err = function(indiv_err, volume) {
     return Math.pow(1 - indiv_err, volume);
 }
 
-// TODO INPUT IS CHANGED FROM total_failure_rate TO total_num_physical_qubits
-Loewenzahn.prototype.gen_data = function(total_failure_rate, experiment) {
+Loewenzahn.prototype.gen_data = function(experiment) {
 
     var space_min   = experiment.footprint;
     var volume_min  = experiment.volume;
@@ -122,7 +119,7 @@ Loewenzahn.prototype.init_visualisation = function() {
         .attr("id", "plotsvg" + ref.plot_name.replace(".", ""))
         .attr("transform", "translate(" + ref.options.margin.left + "," + ref.options.margin.top + ")");
 
-    var data = this.gen_data(total_failure_rate, experiment);
+    var data = this.gen_data(experiment);
 
     d3.select('#plotsvg' + ref.plot_name.replace(".", "")).selectAll('rect')
         .data(data)
@@ -215,7 +212,7 @@ Loewenzahn.prototype.update_data = function() {
     }
 
     if (this.parameters["bool_update_plot"]) {
-        var data = this.gen_data(total_failure_rate, experiment);
+        var data = this.gen_data(experiment);
         d3.select(this.plot_name).selectAll("rect")
             .data(data)
             .transition().duration(1000)

@@ -1,4 +1,4 @@
-function Maigloeckchen(name, vis_options, estimation_method) {
+function Maigloeckchen(name, vis_options) {
     /*
         Parameters
     */
@@ -11,8 +11,6 @@ function Maigloeckchen(name, vis_options, estimation_method) {
     this.plot_name = name;
     //
     this.options = vis_options;
-    //
-    this.estimation_method = estimation_method;
     //
     var ref = this;
 
@@ -57,8 +55,7 @@ Maigloeckchen.prototype.init_visualisation = function() {
         .attr("id", "plotsvg" + ref.plot_name.replace(".", ""))
         .attr("transform", "translate(" + ref.options.margin.left + "," + ref.options.margin.top + ")");
 
-    // var data = plot_generators[plot_name](total_failure_rate, volume_min, space_min, phys_error_rate);
-    var data = this.gen_data(total_failure_rate, experiment);
+    var data = this.gen_data(experiment);
 
     d3.select('#plotsvg' + ref.plot_name.replace(".", "")).selectAll('rect')
         .data(data)
@@ -151,7 +148,7 @@ Maigloeckchen.prototype.init_visualisation = function() {
         .text("Space Factor");
 }
 
-Maigloeckchen.prototype.gen_data = function(total_failure_rate, experiment) {
+Maigloeckchen.prototype.gen_data = function(experiment) {
     // 2D Array
 
     var start_volume = experiment.volume;
@@ -160,13 +157,13 @@ Maigloeckchen.prototype.gen_data = function(total_failure_rate, experiment) {
 
     var data = new Array();
 
-    var ret_1 = calculate_total(this.estimation_method, start_volume, start_space, total_failure_rate, p_err);
+    var ret_1 = calculate_total(start_volume, start_space, p_err);
 
     for (var i = 0; i < this.global_v.length; i++) {
         for (var j = 0; j < this.global_s.length; j++) {
             var space_param = approx_mult_factor(this.global_s[j], start_space);
             var vol_param = approx_mult_factor(this.global_v[i], start_volume);
-            var ret_2 = calculate_total(this.estimation_method, vol_param, space_param, total_failure_rate, p_err);
+            var ret_2 = calculate_total(vol_param, space_param, p_err);
 
             if ((ret_1 == "ERROR") || (ret_2 == "ERROR")) {
                 console.log("SOMETHING WENT WRONG!!!");
@@ -203,7 +200,7 @@ Maigloeckchen.prototype.update_data = function() {
     }
 
     if (this.parameters["bool_update_plot"]) {
-        var data = this.gen_data(total_failure_rate, experiment)
+        var data = this.gen_data(experiment)
         d3.select(this.plot_name).selectAll("rect")
             .data(data)
             .transition().duration(1000)

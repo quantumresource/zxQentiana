@@ -1,4 +1,4 @@
-function paler_analysis(estimation_method, data) {
+function paler_analysis(data) {
     var curr_volume = approx_mult_factor(data.y, experiment.volume);
     var curr_space = approx_mult_factor(data.x, experiment.footprint);
 
@@ -18,7 +18,7 @@ function paler_analysis(estimation_method, data) {
     */
     var recomputed_volume = volume_in_case_no_depth_scale * threshold;
     
-    var recalc = calculate_total(estimation_method, recomputed_volume, experiment.footprint, total_failure_rate, experiment.physical_error_rate);
+    var recalc = calculate_total(recomputed_volume, experiment.footprint, experiment.physical_error_rate);
 
     var ret = {
         dist: recalc.dist,

@@ -41,8 +41,6 @@
     <script>
       var experiment = experiments["pyZX"]; //default experiment when loaded
       
-      var total_failure_rate = 0.01;//99% reliability
-
       var plot_names = [];
       var plot_objects = {};
 
@@ -56,34 +54,20 @@
       vis_options.width = 450 - vis_options.margin.right - vis_options.margin.left;
       vis_options.height = 450 - vis_options.margin.top - vis_options.margin.bottom;
 
-      function calculate_total(estimation_method, volume, space, total_failure_rate, p_cycle_err)
+      function calculate_total(volume, space, p_cycle_err)
       {
           var ret_obj = {
               dist : -1,
               number_of_physical_qubits: -1
           };
 
-          if(estimation_method == "a12")
-          {
-              var dist = calc_distance(total_failure_rate, p_cycle_err, volume);
+        // var res = austin_data_qubits(space, volume, 9900, p_cycle_err);
+        var res = austin_data_qubits(space, volume, experiment.safety_factor, p_cycle_err);
 
-              ret_obj.dist = dist;
-              ret_obj.number_of_physical_qubits = number_of_physical_qubits(dist, space);
-          }
-          else if(estimation_method == "a18")
-          {
-              // var res = austin_data_qubits(space, volume, 9900, p_cycle_err);
-              var res = austin_data_qubits(space, volume, experiment.safety_factor, p_cycle_err);
-
-              ret_obj.dist = res.distance;
-              ret_obj.number_of_physical_qubits = res.qubits;
-          }
-          else
-          {
-              console.log("ERROR: no calculation type specified!");
-          }
+        ret_obj.dist = res.distance;
+        ret_obj.number_of_physical_qubits = res.qubits;
           
-          return ret_obj;
+        return ret_obj;
       }
   </script>
 
@@ -282,7 +266,6 @@ cons.innerText += estimation
                     output.style.top = (d3.event.pageY+30)+"px";
                     output.style.left = (d3.event.pageX+10)+"px";
                 }
-
 
                 function update_plots()
                 {

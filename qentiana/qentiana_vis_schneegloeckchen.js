@@ -1,4 +1,4 @@
-function Schneegloeckchen(name, vis_options, estimation_method) {
+function Schneegloeckchen(name, vis_options) {
     /*
         Parameters
     */
@@ -11,8 +11,6 @@ function Schneegloeckchen(name, vis_options, estimation_method) {
     this.plot_name = name;
     //
     this.options = vis_options;
-    //
-    this.estimation_method = estimation_method;
     //
     var ref = this;
 
@@ -82,7 +80,7 @@ Schneegloeckchen.prototype.init_visualisation = function() {
         .attr("transform", "translate(" + (movex / 2) + "," + (movey + (2*ref.options.margin.bottom)) + ")") // centre below axis
         .text("Space Factor");
 
-    var data = this.gen_data(total_failure_rate, experiment)
+    var data = this.gen_data(experiment)
 
     d3.select('#plotsvg' + ref.plot_name.replace(".", "")).selectAll('rect')
         .data(data)
@@ -124,7 +122,7 @@ Schneegloeckchen.prototype.init_visualisation = function() {
         .on('mouseout', mouseOut);
 }
 
-Schneegloeckchen.prototype.gen_data = function(total_failure_rate, experiment) {
+Schneegloeckchen.prototype.gen_data = function(experiment) {
     
     var volume_min = experiment.volume;
     var space_min = experiment.footprint;
@@ -136,10 +134,10 @@ Schneegloeckchen.prototype.gen_data = function(total_failure_rate, experiment) {
     for (var i = 0; i < this.global_v.length; i++) {
         for (var j = 0; j < this.global_s.length; j++) {
             var space_param = approx_mult_factor(this.global_s[j], space_min);
-            var ret_1 = calculate_total(this.estimation_method, volume_min, space_param, total_failure_rate, p_err);
+            var ret_1 = calculate_total(volume_min, space_param, p_err);
 
             var vol_param = approx_mult_factor(this.global_v[i], volume_min);
-            var ret_2 = calculate_total(this.estimation_method, vol_param, space_min, total_failure_rate, p_err);
+            var ret_2 = calculate_total(vol_param, space_min, p_err);
 
             if ((ret_1 == "ERROR") || (ret_2 == "ERROR")) {
                 console.log("SOMETHING WENT WRONG!!!");
@@ -167,11 +165,7 @@ Schneegloeckchen.prototype.color_interpretation = function(data) {
     var component_red = data.ratio;
     var component_blue = data.ratio;
 
-    var analysis = paler_analysis(this.estimation_method, data);
-
-    if (this.estimation_method == "a12") {
-        component_blue = 128;
-    }
+    var analysis = paler_analysis(data);
 
     if (analysis.ok)
         component_green = 255;
@@ -192,7 +186,7 @@ Schneegloeckchen.prototype.update_data = function() {
 
 
     if (this.parameters["bool_update_plot"]) {
-        var data = this.gen_data(total_failure_rate, experiment);
+        var data = this.gen_data(experiment);
         
         d3.select(this.plot_name).selectAll("rect")
             .data(data)

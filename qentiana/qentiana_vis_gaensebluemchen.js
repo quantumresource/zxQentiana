@@ -1,4 +1,4 @@
-function Gaensebluemchen(name, vis_options, estimation_method) {
+function Gaensebluemchen(name, vis_options) {
     /*
     Parameters
     */
@@ -13,8 +13,6 @@ function Gaensebluemchen(name, vis_options, estimation_method) {
     this.plot_name = name;
     //
     this.options = vis_options;
-    //
-    this.estimation_method = estimation_method;
     //
     this.console_text = "";
     var ref = this;
@@ -67,7 +65,7 @@ function Gaensebluemchen(name, vis_options, estimation_method) {
     }
 }
 
-Gaensebluemchen.prototype.gen_data = function(total_failure_rate, experiment) {
+Gaensebluemchen.prototype.gen_data = function(experiment) {
     
     var volume_min = experiment.volume;
     var space_min = experiment.footprint;
@@ -86,8 +84,7 @@ Gaensebluemchen.prototype.gen_data = function(total_failure_rate, experiment) {
         volume_param = approx_mult_factor(volume_min, this.x_axis_values[i]);
 
         //maybe change names for this data array because different meaning of output
-        // console.log("1.");
-        ret = calculate_total(this.estimation_method, volume_param, space_min, total_failure_rate, experiment.physical_error_rate);
+        ret = calculate_total(volume_param, space_min, experiment.physical_error_rate);
 
         if (dist_last != -1 && dist_last != ret.dist) {
             dist_changes.push({
@@ -107,9 +104,7 @@ Gaensebluemchen.prototype.gen_data = function(total_failure_rate, experiment) {
         var space_2 = approx_mult_factor(space_min, (1 / factor));
         var volume_2 = approx_mult_factor(volume_param, (1 / factor));
 
-        // console.log("2." + volume_2 + " " + space_2+ " " + total_failure_rate + " " + p_err);
-        // console.log("2. " + volume_param + " " + space_min + " " + (1/factor))
-        var ret_vol_2 = calculate_total(this.estimation_method, volume_2, space_2, total_failure_rate, experiment.physical_error_rate);
+        var ret_vol_2 = calculate_total(volume_2, space_2, experiment.physical_error_rate);
 
         /*
         Increase distance to lower res with data bus
@@ -130,9 +125,7 @@ Gaensebluemchen.prototype.gen_data = function(total_failure_rate, experiment) {
             var volume_inc_distance = volume_2 * increased_distance;
             // space_min is not number of patches, but number of logical qubits, and the data bus counts as a qubit
 
-            // console.log("3.");
-            var ret_3 = calculate_total(this.estimation_method, volume_inc_distance, space_min, total_failure_rate, experiment.physical_error_rate);
-            // var ret_3 = calculate_total(this.estimation_method, volume_inc_distance, space_2, total_failure_rate, p_err);
+            var ret_3 = calculate_total(volume_inc_distance, space_min, experiment.physical_error_rate);
 
             if (ret_3.dist <= increased_distance) {
                 /*this number was calculated for the full layout without data bus*/
@@ -222,7 +215,9 @@ Gaensebluemchen.prototype.draw_line_plot = function(data) {
     var slice_index = 0;
 
     for (var i = 0; i < data.length; i++) {
-        if (data[i].use_data_bus) {
+        // if (data[i].use_data_bus) {
+        if(true){
+            /*Always plot data bus*/
             if (slices[slice_index].length == 0) {
                 slices[slice_index].push(i);
             }
@@ -374,7 +369,7 @@ Gaensebluemchen.prototype.update_data = function() {
 
     //only change if update_plot_checkbox is checked
     if (this.parameters["bool_update_plot"]) {
-        var out = this.gen_data(total_failure_rate, experiment);
+        var out = this.gen_data(experiment);
 
         d3.select(this.plot_name).selectAll(".line_plot").remove();
         d3.select(this.plot_name).selectAll(".line_plot_red").remove();
