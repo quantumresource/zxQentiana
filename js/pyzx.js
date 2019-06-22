@@ -20,6 +20,8 @@ pyZXJavaScript.prototype.nodeStyle = function(selected) {
 }
 
 pyZXJavaScript.prototype.showGraph = function(tag, graphs, width, height, node_size) {
+    d3.selectAll(tag + " > *").remove();
+    
     var ntab = {};
 
     graph = JSON.parse(graphs)
