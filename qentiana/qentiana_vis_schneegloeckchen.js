@@ -98,13 +98,13 @@ Schneegloeckchen.prototype.init_visualisation = function() {
             return ref.color_interpretation(d);
         })
         .on('mouseover', function(data, param2) {
-            var output = document.getElementById("console");
             var curr_volume = approx_mult_factor(data.y, experiment.volume);
             var curr_space = approx_mult_factor(data.x, experiment.footprint);
             if (data.ratio <= 1)
-                output.style.color = "blue";
+                QentianaMouse.tooltip.style.color = "blue";
             else
-                output.style.color = "orange";
+                QentianaMouse.tooltip.style.color = "orange";
+
             content = "";
             content += data.x + " " + data.y + "->" + data.ratio + "<br>";
             content += "distance vol: " + data.dist_opt_vol + " having a hardware footprint of " + curr_space + " log qubits <br>";
@@ -116,10 +116,11 @@ Schneegloeckchen.prototype.init_visualisation = function() {
             content += "<br>";
             content += "qub vol: " + data.nr_target_vol + "<br>";
             content += "qub spc: " + data.nr_target_space + "<br>";
-            mouseOver(content);
+            
+            qentMouse.mouseOver(content);
         })
-        .on('mousemove', mouseMove)
-        .on('mouseout', mouseOut);
+        .on('mousemove', qentMouse.mouseMove)
+        .on('mouseout', qentMouse.mouseOut);
 }
 
 Schneegloeckchen.prototype.gen_data = function(experiment) {

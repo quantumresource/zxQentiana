@@ -137,17 +137,18 @@ Loewenzahn.prototype.init_visualisation = function() {
             return ref.color_interpretation(d);
         })
         .on('mouseover', function(data, param2) {
-            var output = document.getElementById("console");
-            // clean console
-            output.style.color = "black";
+            QentianaMouse.tooltip.style.color = "black";
+
             var content = "";
+
             content += "Distance at point (" + data.x + ", " + data.y + "): <br>" + data.dist + " <br>";
             content += "error rate in unit cell: " + data.indiv_error + " with a total volume of " + data.total_volume + "<br>";
             content += "Total success probability: " + data.total_error + "<br>";
-            mouseOver(content);
+
+            qentMouse.mouseOver(content);
         })
-        .on('mousemove', mouseMove)
-        .on('mouseout', mouseOut);
+        .on('mousemove', qentMouse.mouseMove)
+        .on('mouseout', qentMouse.mouseOut);
 
 
     svg.append("g")

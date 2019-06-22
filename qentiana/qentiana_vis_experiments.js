@@ -8,13 +8,13 @@
 experiments = {};
 
 experiments["pyZX"] = {
-    volume : 1,
-    footprint : 2,
-    depth: 1,
+    volume : 500,
+    footprint : 10,
+    depth: 50,
     physical_error_rate : 0.001,
     //params to the chart classes
     routing_overhead: 50,
-    bool_distance: false,
+    bool_distance: true,
     enforced_distance: 7,
     safety_factor : 100
 }

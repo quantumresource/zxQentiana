@@ -322,11 +322,11 @@ Gaensebluemchen.prototype.init_visualisation = function() {
         .attr('height', ref.options.height)
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
-        .on('mouseout', mouseOut)
+        .on('mouseout', qentMouse.mouseOut)
         .on('mouseover', function() {
-            mouseOver(ref.console_text);
+            qentMouse.mouseOver(ref.console_text);
         })
-        .on('mousemove', mouseMove);
+        .on('mousemove', qentMouse.mouseMove);
 }
 
 Gaensebluemchen.prototype.collect_parameters = function() {

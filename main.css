@@ -7,15 +7,17 @@ body {
   float: left;
 }
 
+.inputcontainer span{
+  color:green;
+}
+
 
 .controlbox{
   border-radius: 25px;
   margin-bottom: 20px;
   position: relative;
-  right:5%;
-  float:right;
   width:90%;
-  text-align: center;
+  /* text-align: center; */
 }
 
 
@@ -27,7 +29,7 @@ path {
 }
 
 .input {
-  width: 200px; /* Full-width */
+  width: 30%; /* Full-width */
   height: 25px; /* Specified height */
   background: #d3d3d3; /* Grey background */
   color: #1a2e58;
@@ -80,11 +82,12 @@ path {
   stroke: red;
 }
 
-#console{
+#tooltip{
   background-color: rgba(255, 255, 255, 0.9);
   position: absolute;
   height: 250px;
   width: 300px;
   visibility: "hidden";
   font-family: 'Roboto', sans-serif;
+  font-size: 8pt;
 }
