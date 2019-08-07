@@ -15,7 +15,7 @@ Each individual project can be found on their respective github repositories:
 
 - PyZX: [Github](https://github.com/Quantomatic/pyzx) [Demo](http://zxcalculus.com/pyzx.html)
 - Qentiana: [Github](https://github.com/herr-d/qentiana) [Website](https://herr-d.github.io/qentiana/)
-- OpenSurgery: [Github](https://github.com/alexandrupaler/opensurgery) [Website]((https://github.com/alexandrupaler/opensurgery)
+- OpenSurgery: [Github](https://github.com/alexandrupaler/opensurgery) [Website](https://alexandrupaler.github.io/opensurgery)
 
 The calculations are performed inside the browser without the need to install Python or use a server that runs Python. This is enabled by the Pyodide package that brings the python scientific stack to the browser [see Github](https://github.com/iodide-project/pyodide).
 
