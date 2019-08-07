@@ -1,434 +1,398 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" href="main.css"> 
-    
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <!-- Custom fonts for this template-->
+    <link href="js/libs/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet"> -->
+
+    <!-- Custom styles for this template-->
+    <link href="js/libs/sb-admin2/sb-admin-2.min.css" rel="stylesheet">
+
     <!-- <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> -->
-    
-    
+
     <script type="text/javascript">
         window.languagePluginUrl = 'githubiofiles/'; // set the pyodide support files (packages.json, pyodide.asm.data etc) url
     </script>
+
     <script src="githubiofiles/pyodide.js"></script>
-    
-    <script src="js/d3.v4.min.js"></script>
+
+    <!--For saving files and SVGs-->
+    <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
+
+    <!--
+        Includes from zxQentiana are JavaScript files
+    -->
     
     <!--Calculations-->
-    <script src="qentiana/othercalculation.js"></script>
-    <script src="qentiana/palerhelpers.js"></script>
-    <script src="qentiana/austinhelpers.js"></script>
-    <script src="qentiana/utilities.js"></script>
-    
-    <script src="qentiana/qentiana_vis_mouse.js"></script>
-    
+    <!-- <script src="zxqentiana/othercalculation.js"></script>
+    <script src="zxqentiana/palerhelpers.js"></script> -->
+    <script src="zxqentiana/austinhelpers.js"></script>
+    <script src="zxqentiana/utilities.js"></script>
+
+    <script src="zxqentiana/svgsaving.js"></script>
+
     <!-- Visualisations from Qentiana-->
-    <script src="qentiana/qentiana_vis_maigloeckchen.js"></script>
-    <script src="qentiana/qentiana_vis_schneegloeckchen.js"></script>
-    <script src="qentiana/qentiana_vis_loewenzahn.js"></script>
-    <script src="qentiana/qentiana_vis_gaensebluemchen.js"></script>
-    <script src="qentiana/qentiana_vis_experiments.js"></script>
-    
-    
+    <script src="zxqentiana/qentiana_gen_plot.js"></script>
+    <script src="zxqentiana/qentiana_vis_maigloeckchen.js"></script>
+    <script src="zxqentiana/qentiana_vis_schneegloeckchen.js"></script>
+    <script src="zxqentiana/qentiana_vis_loewenzahn.js"></script>
+    <script src="zxqentiana/qentiana_vis_gaensebluemchen.js"></script>
+    <script src="zxqentiana/qentiana_vis_experiments.js"></script>
+    <script src="zxqentiana/qentiana_vis_mouse.js"></script>
+
+    <!-- For a more beautiful GUI use Bootstrap and a Admin style arrangement of panels-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- CodeMirror-->
+    <script src="js/libs/codemirror-5.48.2/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="js/libs/codemirror-5.48.2/lib/codemirror.css">
+    <!-- Modes -->
+    <script src="js/libs/codemirror-5.48.2/mode/javascript/javascript.js"></script>
+    <script src="js/libs/codemirror-5.48.2/mode/python/python.js"></script>
+
+    <!-- D3 and friends-->
+    <script src="js/libs/d3.v4.min.js"></script>
     <!-- Visualisation from pyZX-->
-    <script src="js/pyzx.js"></script>
+    <script src="js/pyzxd3plots.js"></script>
+
+    <!-- <script src="js/libs/sb-admin2/sb-admin-2.min.js"></script> -->
+
     <script>
-        pyZXJS = new pyZXJavaScript();
-        
-        qentMouse = new QentianaMouse();
-        
+        //Load the Pyodide environment
         languagePluginLoader.then(function () {
-            pyodide.loadPackage(['pyzx', 'cube_to_physical']);
+            pyodide.loadPackage(['pyzx', 'cube_to_physical']).then(function () {
+                // show interface only now
+                // document.getElementsByTagName("body")[0].style.display = "block";
+
+                //load the script in the texteditor
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open('GET', 'zxqentiana/embeddedscriptpy.py', false);
+                xmlhttp.send();
+
+                myCodeMirror.setValue(xmlhttp.responseText);
+            });
         });
-    </script>
-    
-    <!-- initialize global parameters and functions used by all classes -->
-    <script>
-        var experiment = experiments["pyZX"]; //default experiment when loaded
-        
-        var plot_names = [];
-        var plot_objects = {};
-        
-        /*
-        Parameters for the display inside the chart div
-        */
-        var vis_options = {};
-        vis_options.itemSize = 3;
-        vis_options.cellSize = vis_options.itemSize + 1; // make them slightly overlap so there are no lines
-        vis_options.margin = {top: 20, right: 30, bottom: 20, left: 50};
-        vis_options.width = 450 - vis_options.margin.right - vis_options.margin.left;
-        vis_options.height = 450 - vis_options.margin.top - vis_options.margin.bottom;
-        
-        function calculate_total(volume, space, p_cycle_err)
-        {
+
+        function calculate_total(volume, space, p_cycle_err) {
             var ret_obj = {
-                dist : -1,
+                dist: -1,
                 number_of_physical_qubits: -1
             };
-            
-            // var res = austin_data_qubits(space, volume, 9900, p_cycle_err);
+
             var res = austin_data_qubits(space, volume, experiment.safety_factor, p_cycle_err);
-            
+
             ret_obj.dist = res.distance;
             ret_obj.number_of_physical_qubits = res.qubits;
-            
+
             return ret_obj;
         }
     </script>
-    
 </head>
 
 <body>
-    <div style="width: 90%; float:left; background:lightskyblue; margin:10px" id="fig_circuit">
-        <div style="float: left; width:30%">
-            <img src="enzian.png" height="80" style="transform: scaleX(-1); float:right;">
-        </div>
-        <div style="float: left;width:30%; text-align: center;">
-            <h3>zxQentiana <a target="_blank" href="https://github.com/quantumresource/zxQentiana">Github repository</a></h3>
-        </div>
-        <div style="float: left;">
-            <img src="enzian.png" height="80">
-        </div>
-    </div>
-    <div class="controlbox"style="width: 20%; float:left; height:400px; background:lightcoral; margin:10px">
-        <input type="button" value="Random PyZX Circuit" id="btnrun" onclick="runscript()">
-        <br>
-        <div style="height: 140px; text-align: center;">
-            Experiment:<br>
-            <select id="select_experiments" name="select_experiments" size="5" style="width:200px">
-            </select>
-        </div>
-        <div id="controls" style="font-size:10pt; overflow: hidden; margin-bottom: 20px;">
-            <div class="inputcontainer">
-                Depth: <span id="value_depth"></span>
-                <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" target="_blank" href="https://github.com/quantumresource/zxQentiana">
+                <img src="enzian.png" height="30" style="transform: scaleX(-1); float:right;">
+                <div class="sidebar-brand-text mx-3">
+                    zxQentiana
+                </div>
+                <img src="enzian.png" height="30">
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Random Circuit
             </div>
-            <div class="inputcontainer">
-                Qubits <span id="value_qubits"></span>
-                <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
+
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:runscript()">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Click!</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Experiment
             </div>
-            <div class="inputcontainer">
-                Volume: <span id="value_volume"></span>
-                <input type="number" min="1" value="0" step="1" id="input_volume_field" class="input" readonly>
+
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <div style="height: 140px; text-align: center;">
+                    <select id="select_experiments" name="select_experiments" size="5" style="width:200px">
+                    </select>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Manual Configuration
             </div>
-            <div class="inputcontainer">
-                per cycle error: <span id="value_error"></span>
-                <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
+
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <div class="row no-gutters align-items-center">
+                    <div class="inputcontainer">
+                        Depth: <span id="value_depth"></span>
+                        <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
+                    </div>
+                    <div class="inputcontainer">
+                        Qubits <span id="value_qubits"></span>
+                        <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
+                    </div>
+                    <div class="inputcontainer">
+                        Volume: <span id="value_volume"></span>
+                        <input type="number" min="1" value="0" step="1" id="input_volume_field" class="input" readonly>
+                    </div>
+                    <div class="inputcontainer">
+                        per cycle error: <span id="value_error"></span>
+                        <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
+                    </div>
+                    <div class="inputcontainer">
+                        <input type="checkbox" id="input_force_distance" style="margin-bottom: 15px">
+                        Use Fixed Distance <span id="value_distance"></span>
+                        <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
+                    </div>
+                    <div class="inputcontainer">
+                        scaling factor (in percent): <span id="routing_overhead"></span>
+                        <input type="number" min="-99" value="50" step="1" id="input_routing_overhead" class="input">
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Already Existing Circuits
             </div>
-            <div class="inputcontainer">
-                <input type="checkbox" id="input_force_distance" style="margin-bottom: 15px">
-                Use Fixed Distance <span id="value_distance"></span>
-                <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                scaling factor (in percent): <span id="routing_overhead"></span>
-                <input type="number" min="-99" value="50" step="1" id="input_routing_overhead" class="input">
-            </div>
-            
-        </div>
-    </div>
-    
-    <div style="width: 70%; float:left; height:400px; background:rgb(203, 219, 182); margin:10px" id="fig_circuit">
-        <p>
-            Click and drag the nodes.
-        </p>
-        <br>
-        <div id="graph-output-1" style="overflow:auto"></div>
-    </div>
-    <div id="prev_qentiana" class="controlbox" style="overflow: hidden;">
-        <!-- tooltip -->
-    </div>
-    
-    <div class="plot1 chart" style="float: left">
-        <!-- Here should be the plot -->
-    </div>
-    
-    <div class="plot2 chart" style="float: left">
-        <!-- Here should be the plot -->
-    </div>
-    
-    <div class="plot3 chart" style="float: left">
-        <!-- Here should be the plot -->
-    </div>
-    
-    <div class="plot4 chart" style="float: left">
-        <!-- Here should be the plot -->
-    </div>
-    
-    <script>
-        //add all options
-        add_options_to_select();
-        
-        add_event_handlers();
-        
-        plot_names = [ ".plot1" , ".plot2", ".plot3", ".plot4"];
-        
-        plot_objects[".plot1"] = new Gaensebluemchen(".plot1", vis_options, "a18");
-        plot_objects[".plot2"] = new Schneegloeckchen(".plot2", vis_options, "a18");
-        plot_objects[".plot3"] = new Maigloeckchen(".plot3", vis_options, "a18");
-        plot_objects[".plot4"] = new Loewenzahn(".plot4", vis_options, "a18");
-        //plot_objects[".plot5"] = new Schneegloeckchen(".plot1", vis_options, "a12"); //old estimation method
-        
-        for(var index in plot_names)
-        {
-            var pl_name = plot_names[index];
-            
-            plot_objects[pl_name].init_visualisation();
-        }
-        
-        function update_plots()
-        {
-            // console.clear();
-            console.log("--------------------");
-            
-            for(var index in plot_names)
-            {
-                var plot_name = plot_names[index];
-                var data = plot_objects[plot_name].update_data();
-            }
-            
-            update_labels();
-            
-            return 0;
-        }
-        
-        function update_labels()
-        {
-            var depth_input = document.getElementById("input_depth_field");
-            var volume_input = document.getElementById("input_volume_field");
-            var logical_qubits_input = document.getElementById("input_qubit_field");
-            var phys_err_rate_input = document.getElementById("input_err_field");
-            var force_distance_input = document.getElementById("input_force_distance");
-            var distance_input = document.getElementById("input_distance_field");
-            var routing_overhead_input = document.getElementById("input_routing_overhead");
-            
-            depth_input.value               = experiment.depth;
-            volume_input.value              = experiment.volume;
-            logical_qubits_input.value      = experiment.footprint;
-            phys_err_rate_input.value       = experiment.physical_error_rate;
-            force_distance_input.checked    = experiment.bool_distance;
-            distance_input.value            = experiment.enforced_distance;
-            routing_overhead_input.value    = experiment.routing_overhead;
-            
-            var output0 = document.getElementById("value_depth");
-            output0.innerHTML = depth_input.value;
-            
-            var output1 = document.getElementById("value_volume");
-            output1.innerHTML = volume_input.value;
-            
-            var output2 = document.getElementById("value_qubits");
-            output2.innerHTML = logical_qubits_input.value;
-            
-            var output3 = document.getElementById("value_error");
-            output3.innerHTML = phys_err_rate_input.value;
-            
-            var output4 = document.getElementById("value_distance");
-            output4.innerHTML = distance_input.value;
-            
-            var output5 = document.getElementById("routing_overhead");
-            output5.innerHTML = routing_overhead_input.value;
-        }
-        
-        function add_event_handlers()
-        {
-            var depth_input = document.getElementById("input_depth_field");
-            // var volume_input = document.getElementById("input_volume_field");
-            var logical_qubits_input = document.getElementById("input_qubit_field");
-            var phys_err_rate_input = document.getElementById("input_err_field");
-            var force_distance_input = document.getElementById("input_force_distance");
-            var distance_input = document.getElementById("input_distance_field");
-            var routing_overhead_input = document.getElementById("input_routing_overhead");
-            
-            var select_experiments_input = document.getElementById("select_experiments");
-            
-            update_labels();
-            
-            // Update the current slider value (each time you drag the slider handle)
-            depth_input.onchange = function() {
-                
-                experiment.depth = this.value;
-                
-                //the volume is the number of qubits x time x routing factor
-                experiment.volume = (experiment.routing_overhead * experiment.footprint) * experiment.depth;
-                update_plots();
-            }
-            
-            // Update the current slider value (each time you drag the slider handle)
-            // volume_input.onchange = function() {
-                //     volume_min = this.value;
-                //     update_plots();
-                // }
-                
-                // Update the current slider value (each time you drag the slider handle)
-                logical_qubits_input.onchange = function() {
-                    experiment.footprint = this.value;
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <!-- <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div> -->
+
+        </ul>
+        <!-- End of Sidebar -->
+
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Diagrams Section -->
+                    <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Code Editor</h1>
+                    </div> -->
                     
-                    experiment.volume = (experiment.routing_overhead * experiment.footprint) * experiment.depth;
-                    
-                    update_plots();
-                } 
-                
-                // Update the current slider value (each time you drag the slider handle)
-                phys_err_rate_input.onchange = function() {
-                    experiment.physical_error_rate = this.value;
-                    // console.log(experiment.physical_error_rate)
-                    update_plots();
-                }
-                
-                // Update the current slider value (each time you drag the slider handle)
-                force_distance_input.onchange = function() {
-                    experiment.bool_distance = this.checked;
-                    update_plots();
-                }
-                
-                // Update the current slider value (each time you drag the slider handle)
-                distance_input.onchange = function() {
-                    experiment.enforced_distance = this.value;
-                    if(experiment.bool_distance){
-                        update_plots();
-                    }
-                }
-                
-                routing_overhead_input.onchange = function() {
-                    experiment.routing_overhead = this.value;
-                    update_plots();
-                }
-                
-                select_experiments_input.onchange = function() {
-                    experiment = experiments[this.value];
-                    // console.log(experiment);
-                    update_plots();
-                }
-            }
-            
-            function add_options_to_select(){
-                select = document.getElementById('select_experiments');
-                for(var name in experiments){
-                    var opt = document.createElement('option');
-                    opt.value = name;
-                    opt.innerHTML = name;
-                    select.appendChild(opt);
-                }
-            }
-        </script>
+                    <div class="row" id="divscript">
+                        <!-- Card Header - Accordion -->
+                        <a href="#collapseScript" class="d-block card-header py-3" data-toggle="collapse" role="button"
+                            aria-expanded="true" aria-controls="collapseScript">
+                            <h6 class="m-0 font-weight-bold text-primary">Python Script</h6>
+                        </a>
+                        <div class="collapse show col-lg-12" id="collapseScript">
+                            <textarea name="txt_script" id="txt_script">
+                            </textarea>
+                        </div>
+                    </div>
+                        
+                    <!--
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Trade-Off Analysis</h1>
+                    </div> -->
+
+                    <div class="row" id="divplots12">
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-6">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapsePlot1" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapsePlot1">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot1desc">Collapsable Card
+                                        Example</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show row py-3" id="collapsePlot1">
+                                    <div class="card-body col-sm-6" style="height:20vw">
+                                        <div class="plot1 chart">
+                                            <!-- Here should be the plot -->
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-md-4 m-3 plotconsole" id="plot1console">
+
+                                    </div>
+
+                                    <div class="card-body col-lg-12" id="plot1params">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-6">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapsePlot2" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapsePlot2">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot2desc">Collapsable Card
+                                        Example</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show row py-3" id="collapsePlot2">
+                                    <div class="card-body col-sm-6" style="height:20vw">
+                                        <div class="plot2 chart">
+                                            <!-- Here should be the plot -->
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-md-4 m-3 plotconsole" id="plot2console">
+
+                                    </div>
+                                    <div class="card-body col-lg-12" id="plot2params">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="divplots34">
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-6">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapsePlot3" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapsePlot3">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot3desc">Collapsable Card
+                                        Example</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show row py-3" id="collapsePlot3">
+                                    <div class="card-body col-sm-6" style="height:20vw">
+                                        <div class="plot3 chart">
+                                            <!-- Here should be the plot -->
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-md-4 m-3 plotconsole" id="plot3console">
+
+                                    </div>
+                                    <div class="card-body col-lg-12" id="plot3params">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-6">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapsePlot4" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapsePlot4">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot4desc">Collapsable Card
+                                        Example</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show show row py-3" id="collapsePlot4">
+                                    <div class="card-body col-sm-6" style="height:20vw">
+                                        <div class="plot4 chart">
+                                            <!-- Here should be the plot -->
+                                        </div>
+                                    </div>
+                                    <div class="card-body col-md-4 m-3 plotconsole" id="plot4console">
+
+                                    </div>
+                                    <div class="card-body col-lg-12" id="plot4params">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="divoutput">
+                        <!-- Collapsable Card Example -->
+                        <div class="col-lg-12">
+                            <div class="card shadow mb-12">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseOutput" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapseOutput">
+                                    <h6 class="m-0 font-weight-bold text-primary">Generated ZX diagram</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseOutput">
+                                    <div class="card-body">
+                                        <div>
+                                            Click and drag the nodes.
+                                        </div>
+                                        <div id="fig_circuit"
+                                            style="height:30vw; background:rgb(203, 219, 182); margin:10px">
+
+                                        </div>
+                                        <!-- <div id="graph-output-1"></div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="divconsole">
+                        <div class="col-lg-12">
+                            <div class="card shadow mb-12">
+                                <!-- Card Header - Accordion -->
+                                <a href="#collapseConsole" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapseConsole">
+                                    <h6 class="m-0 font-weight-bold text-primary">Console Output</h6>
+                                </a>
+                                <!-- Card Content - Collapse -->
+                                <div class="collapse show" id="collapseConsole">
+                                    <div class="card-body">
+                                        <div style="height:400px; background:lightskyblue; margin:10px"
+                                            id="txt_console">
+                                            <!--console...-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- End of Main Content -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+        </div>
+        <!-- End of Page Wrapper -->
+
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+        </a>
     </div>
-    
-    <script type="text/javascript">
-        function py (code)
-        {
-            return pyodide.runPython(code);
-        }
-        
-        function runscript()
-        {
-            //read script
-            scriptLines = document.getElementById("txt_script").value;
-            //run script
-            py(scriptLines);
-        }
-    </script>
-    
-    <div style="width: 90%; float:left; height:400px; background:lightskyblue; margin:10px" id="txt_console">
-        <!--console...-->
-    </div>
 
-    <textarea rows="4" id="txt_script" style="width:90%; height:90%">
-import json
-from fractions import Fraction
+    <!-- <div id="tooltip" style="visibility: hidden; z-index: 2000;"> -->
 
-import pyzx as zx
-import cube_to_physical as qre
-
-# https://github.com/iodide-project/pyodide/blob/master/docs/type_conversions.md#using-javascript-objects-from-python
-from js import document
-from js import pyZXJS
-from js import experiment
-from js import update_plots
-
-# get DOM elements
-cons = document.getElementById("txt_console")
-figcircuit = document.getElementById("fig_circuit")
-
-def phase_to_s(a):
-    if not a: return ''
-    if not isinstance(a, Fraction):
-        a = Fraction(a)
-    ns = '' if a.numerator == 1 else str(a.numerator)
-    ds = '' if a.denominator == 1 else '/' + str(a.denominator)
-
-    # unicode 0x03c0 = pi
-    return ns + '\u03c0' + ds
-
-def draw(g, where, scale=None):
-    if not hasattr(g, 'vertices'):
-        g = g.to_graph()
-
-    if scale == None:
-        scale = 800 / (g.depth() + 2)
-        if scale > 50: scale = 50
-        if scale < 20: scale = 20
-
-    node_size = 0.2 * scale
-    if node_size < 2: node_size = 2
-
-    node_size = 5
-
-    w = (g.depth() + 2) * scale
-    h = (g.qubit_count() + 3) * scale
-
-    nodes = [{'name': str(v),
-                'x': (g.row(v) + 1) * scale,
-                'y': (g.qubit(v) + 2) * scale,
-                't': g.type(v),
-                'phase': phase_to_s(g.phase(v)) }
-                for v in g.vertices()]
-    links = [{'source': str(g.edge_s(e)),
-                'target': str(g.edge_t(e)),
-                't': g.edge_type(e) } for e in g.edges()]
-    
-    graphj = json.dumps({'nodes': nodes, 'links': links})
-
-    pyZXJS.showGraph('#graph-output-1', graphj, w, h, node_size)
-
-#
-# PyZX part
-#
-qubit_amount = 10
-gate_count = 80
-
-#Generate random circuit of Clifford gates
-circuit = zx.generate.cliffordT(qubit_amount, gate_count)
-
-#Use one of the built-in rewriting strategies to simplify the circuit
-zx.simplify.full_reduce(circuit)
-
-draw(circuit, figcircuit)
-
-# Some information from the circuit
-t_count = zx.tcount(circuit)
-max_log_qubits = circuit.qubit_count()
-
-cons.innerText += "T gates from pyZX " + str(t_count) + " " + str(max_log_qubits)
-
-experiment.depth = t_count
-experiment.footprint = max_log_qubits
-experiment.volume = 1.5 * experiment.depth * experiment.footprint
-update_plots()
-
-# estimate the resources
-qentiana = qre.Qentiana(t_count, max_log_qubits)
-res_values = qentiana.compute_physical_resources()
-estimation = "\nResource prediction (phys. qubits, time): " + str(res_values)
-
-#print estimation
-cons.innerText += estimation
-    </textarea>
-    
-    <div id="tooltip" style="visibility: hidden; z-index: 2000;">
-        <script>
-            qentMouse.findToolTip();
-            // console.log(QentianaMouse.tooltip);
-        </script>
-        
-    </body>
-    
+    <script src="endofindex.js"></script>
+</body>

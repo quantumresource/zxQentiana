@@ -1,11 +1,31 @@
-.PHONY: all clean
-all: cube_to_physical.js
+# the variables are from the Makefile in the parent folder
+# see -I parameter to make
+include Makefile.globals.mk
 
-cube_to_physical.py:
-	wget https://raw.githubusercontent.com/alexandrupaler/opensurgery/master/cube_to_physical.py
+.PHONY = all compile clean
 
-cube_to_physical.js: cube_to_physical.py
-	${PYTHON} ${PYODIDE_PATH}/tools/file_packager.py cube_to_physical.data --preload cube_to_physical.py@/lib/python3.7/site-packages/ --abi=1 --export-name=pyodide._module --js-output=cube_to_physical.js --exclude __pycache__ --use-preload-plugins
+STORE_FOLDER = pyqentiana
+REPOSITORY_URL = https://raw.githubusercontent.com/alexandrupaler/opensurgery/master/resanalysis
+COMPILE_NAME = cube_to_physical
+
+all: compile
+
+compile: ${STORE_FOLDER}/%.py
+
+${STORE_FOLDER}/%.py: | ${STORE_FOLDER}
+	${PYTHON} ${PYODIDE_PATH}/tools/file_packager.py ${COMPILE_NAME}.data --js-output=${COMPILE_NAME}.js --preload ${STORE_FOLDER}@/lib/python3.7/site-packages/ --abi=1 --export-name=pyodide._module --exclude __pycache__ --use-preload-plugins
+
+${STORE_FOLDER}:
+	mkdir -p ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/cube_to_physical.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/distance_bins.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/phys_qubits_vs_log_err.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/res_savings.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/res_utils.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/time_vs_space.py -P ${STORE_FOLDER}
 
 clean:
-	rm *.js *.data
+	# delete the downloaded py files
+	rm -rf ${STORE_FOLDER}
+	# delete the transpiled files
+	rm ${COMPILE_NAME}.js ${COMPILE_NAME}.data

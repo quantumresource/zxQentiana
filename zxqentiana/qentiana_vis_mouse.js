@@ -15,16 +15,18 @@ QentianaMouse.prototype.findToolTip = function(){
 }
 
 QentianaMouse.prototype.mouseOut = function(){
-    QentianaMouse.tooltip.innerHTML = "";
-    QentianaMouse.tooltip.style.visibility = "hidden";
+    // QentianaMouse.tooltip.innerHTML = "";
+    // QentianaMouse.tooltip.style.visibility = "hidden";
 }
 
-QentianaMouse.prototype.mouseOver = function(HTML_content){
-    QentianaMouse.tooltip.style.visibility = "visible";
-    QentianaMouse.tooltip.innerHTML = HTML_content;
+QentianaMouse.prototype.mouseOver = function(console_element, HTML_content){
+    // QentianaMouse.tooltip.style.visibility = "visible";
+    // QentianaMouse.tooltip.innerHTML = HTML_content;
+
+    console_element.innerHTML = HTML_content;
 }
 
 QentianaMouse.prototype.mouseMove = function(){
-    QentianaMouse.tooltip.style.top = (d3.event.pageY + 30)+"px";
-    QentianaMouse.tooltip.style.left = (d3.event.pageX + 10)+"px";
+    // QentianaMouse.tooltip.style.top = (d3.event.pageY + 30)+"px";
+    // QentianaMouse.tooltip.style.left = (d3.event.pageX + 10)+"px";
 }

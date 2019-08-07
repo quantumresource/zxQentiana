@@ -1,28 +1,465 @@
+import math
+
+from . import res_utils as resu
+from . import cube_to_physical as qre
+
+class PhysicalQubitsVsLogicalError:
+    def __init__(self):
+        #
+        self.nr_items = 100
+        # log spaced volume scaling factor
+        self.global_v = resu.local_logspace(-2, 2, self.nr_items)
+        # scaling factor space
+        self.global_s = resu.local_linspace(0.1, 2, self.nr_items)
+        #
+        self.explanation = "The initial circuit is at position (1,1) and any optimization will change the " \
+                           "volume and space factor. The final position will show how much resource savings " \
+                           "can be expected. Darker colors are better."
+
+
+    def get_default_parameters(self):
+        parameters = {}
+        parameters["bool_update_plot"] = False
+        parameters["total_num_physical_qubits"] = 500
+
+        return parameters
+
+
+    def total_err(self, per_unit_err, nr_units):
+        # Given a per step error rate
+        # calculate/approximate the total error of the computation
+        # Equivalent1: The sum of probabilities of at least one (one or more) unit failing with per_unit_err
+        # Equivalent2: none of the units fail
+        return math.pow(1 - per_unit_err, nr_units)
+
+
+    def gen_data(self, experiment):
+        """
+
+        :param experiment:
+        :return:
+        """
+        nr_log_qubits = experiment.footprint
+        volume = experiment.volume
+        p_err = experiment.physical_error_rate
+
+        # parameters are collected by the plot var
+        total_num_physical_qubits = self.parameters["total_num_physical_qubits"]
+
+        data = []
+
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                scaled_nr_log_qubits = math.ceil(nr_log_qubits * self.global_s[j])
+                scaled_volume = math.ceil(volume * self.global_v[i])
+
+                # this is the distance that fits on patch
+                dist = qre.Qentiana.max_distance_to_fit_log_qubits_on_phys_qubits(scaled_nr_log_qubits, total_num_physical_qubits)
+
+                # the per log unit approximated failure is computed from the phys err rate and the distance
+                err_per_log_unit = qre.Qentiana.vba_p_logical(p_err, dist)
+
+                # the entire volume will fail with this prob
+                err_per_scaled_volume = self.total_err(err_per_log_unit, scaled_volume)
+
+                # // maybe change names for this data array because different meaning of output
+                data.append({
+                    "x"             : self.global_s[j],
+                    "y"             : self.global_v[i],
+                    "distance"      : dist,
+                    "indiv_error"   : err_per_log_unit,
+                    "total_error"   : err_per_scaled_volume,
+                    "total_volume"  : scaled_volume,
+                    "qubits_used"   : qre.Qentiana.phys_qubits_for_all_log_qubits(scaled_nr_log_qubits, dist)
+
+                })
+
+        return data
+
+    def empty_data(self):
+        data = []
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                # // maybe change names for this data array because different meaning of output
+                data.append({
+                    "x"             : self.global_s[j],
+                    "y"             : self.global_v[i],
+                    "dist"          : 0,
+                    "indiv_error"   : 0,
+                    "total_volume"  : 0,
+                    "qubits_used"   : 0,
+                    "total_error"   : 0
+                })
+
+        return data
+
+
+    def color_interpretation(d):
+        return "rgb(" + str(resu.to_rgb(d["total_error"])) \
+               + "," + str(resu.to_rgb(d["total_error"])) \
+               + "," + str(resu.to_rgb(d["total_error"])) \
+               + ")"
+
+# LoewenzahnData.prototype.compute_over_content = function(data)
+# {
+# var
+# content = "";
+# content += "Distance at point (" + data.x + ", " + data.y + "): <br>" + data.dist + " <br>";
+# content += "error rate in unit cell: " + data.indiv_error + " with a total volume of " + data.total_volume + "<br>";
+# content += "Total success probability: " + data.total_error + "<br>";
+#
+# return content;
+# }
+import math
+
+
+# def analysis(data, experiment):
+#     """
+#
+#     :param data:
+#     :param experiment:
+#     :return:
+#     """
+#
+#     ## The parameters from experiment are scaled using data
+#     # the new volume
+#     volume_scale = data.y
+#     scaled_volume = approx_mult_factor(data.y, experiment.volume)
+#
+#     qre1 = qre.Qentiana(t_count = 0,
+#                         max_logical_qubits = experiment.footprint,
+#                         max_time_units = scaled_volume / experiment.footprint,
+#                         gate_err_rate = experiment.physical_error_rate)
+#
+#     # for a volume of size scaled_volume, what is the distance?
+#     recalc = qre1.compute_physical_resources()
+#
+#     # the computed distance is less than the scaling factor
+#     is_fine = (recalc["distance"] <= volume_scale)
+#
+#     ret = {
+#         "dist"      : recalc["distance"],
+#         "ok"        : is_fine,
+#         "threshold" : volume_scale,
+#         "volume"    : scaled_volume
+#     }
+#
+#     return ret
+
+
+# def approx_mult_factor(factor, value):
+#     return math.ceil(factor * value)
+
+# TODO: replace with numpy calls
+def local_logspace(start, stop, num = 50):
+    # Assume base = 10
+    ret = [] * (num + 1)
+    delta = (stop - start) / num
+
+    for i in range(num):
+        ret[i] = math.pow(10, start + delta * i)
+
+    return ret
+
+
+#TODO: replace with numpy calls
+def local_linspace(start, stop, num = 50):
+    ret = [] * num
+    delta = (stop - start) / num
+
+    for i in range(num):
+        ret[i] = start + delta * i
+
+    return ret
+
+#TODO: replace with numpy calls
+def local_linspace_2(middle, plus_minus_range, num = 50):
+    # assume num is odd
+    if num % 2 == 0:
+        #make odd
+        num += 1
+
+    ret = [] * num
+    middle_index = math.floor(num / 2)
+    ret[middle_index] = middle
+
+    float_ratio = (2 * plus_minus_range) / num
+    half_distance = middle_index
+
+    for i in range(1, half_distance + 1):
+        ret[middle_index + i] = middle + i * float_ratio
+        ret[middle_index - i] = middle - i * float_ratio
+
+    return ret
+
 """
+    RGB functions for the interpretation of a value to integers in range 0..255
+"""
+def to_rgb(param):
+    return (255 if (param > 1) else math.round(param * 255))
+
+def from_rgb(param):
+    # why is 2 here?
+    return 2 if (param == 255) else (param / 255.0)import math
+
+from . import res_utils as resu
+from . import cube_to_physical as qre
+
+class ResourceSavings:
+    def __init__(self, t_count, max_logical_qubits):
+        #
+        self.nr_items = 100
+        # log spaced volume scaling factor
+        self.global_v = resu.local_logspace(-2, 2, self.nr_items)
+        # scaling factor space
+        self.global_s = resu.local_linspace(0.1, 2, self.nr_items)
+        #
+        self.explanation = "The initial circuit is at position (1,1) and any optimization will change the " \
+                           "volume and space factor. The final position will show how much resource savings " \
+                           "can be expected. Darker colors are better."
+
+    def get_default_parameters(self):
+        #
+        self.parameters = {}
+
+
+    def gen_data(self, experiment):
+        # // 2D Array
+        # // take the globale experiment for the moment
+
+        start_volume = experiment.volume
+        start_space = experiment.footprint
+        p_err = experiment.physical_error_rate
+
+        data = []
+
+        qre1 = qre.Qentiana(t_count=0,
+                            max_logical_qubits=start_space,
+                            max_time_units=start_volume / start_space,
+                            gate_err_rate=p_err)
+        ret_1 = qre1.compute_physical_resources()
+
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                #
+                # Two types of scaling are considered simultaneously
+                #
+                # hardware is scaled
+                space_param = math.ceil(self.global_s[j] * start_space)
+                # time is scaled -> thus volume is increased
+                vol_param = math.ceil(self.global_v[i] * start_volume)
+
+
+                # If the initial volume is scaled like this
+                qre2 = qre.Qentiana(t_count=0,
+                                    max_logical_qubits=space_param,
+                                    max_time_units=vol_param / space_param,
+                                    gate_err_rate=p_err)
+                ret_2 = qre2.compute_physical_resources()
+
+                ratio = ret_2["number_of_physical_qubits"] / ret_1["number_of_physical_qubits"]
+
+                data.append({
+                    "x"                 : self.global_s[j],
+                    "y"                 : self.global_v[i],
+                    "dist_opt_vol"      : ret_1["distance"],
+                    "dist_opt_space"    : ret_2["distance"],
+                    "nr_target_vol"     : ret_1["number_of_physical_qubits"],
+                    "nr_target_space"   : ret_2["number_of_physical_qubits"],
+                    "ratio"             : ratio
+                })
+
+        return data
+
+
+
+    def empty_data(self):
+        data = []
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                data.append({
+                    "x"                 : self.global_s[j],
+                    "y"                 : self.global_v[i],
+                    "dist_opt_vol"      : 0,
+                    "dist_opt_space"    : 0,
+                    "nr_target_vol"     : 0,
+                    "nr_target_space"   : 0,
+                    "ratio"             : 0
+                })
+
+        return data
+
+    def color_interpretation(d):
+        return "rgb(" + str(resu.to_rgb(d["ratio"])) + \
+               "," + str(resu.to_rgb(d["ratio"])) + \
+               "," + str(resu.to_rgb(d["ratio"])) + \
+               ")"
+
+    # MaigloeckchenData.prototype.compute_over_content = function(data)
+    # {
+    #     var curr_volume = approx_mult_factor(data.y, experiment.volume);
+    #     var curr_space = approx_mult_factor(data.x, experiment.footprint);
+    #
+    #     content = "";
+    #     content += data.x + " " + data.y + "->" + data.ratio + "<br>";
+    #     content += "distance vol: " + data.dist_opt_vol + " having a hardware footprint of " + curr_space + " log qubits <br>";
+    #     content += "distance space: " + data.dist_opt_space + " for a volume of " + curr_volume + "<br>";
+    #
+    #     content += "tradeoff time scaling threshold<br>" + (data.x * data.y) + "<br>";
+    #     content += "minimum scaling should be below tradeoff threshold:<br>" + data.dist_opt_space + "<br>";
+    #
+    #     content += "<br>";
+    #     content += "qub vol: " + data.nr_target_vol + "<br>";
+    #     content += "qub spc: " + data.nr_target_space + "<br>";
+    #
+    #     return content;
+    # }# class DistanceBins:
+#     def __init__(self):
+#
+#import math
+
+from . import res_utils as resu
+from . import cube_to_physical as qre
+
+class TimeVsSpace:
+    def __init__(self, t_count, max_logical_qubits):
+        #
+        self.nr_items = 100
+        # log spaced volume scaling factor
+        self.global_v = resu.local_logspace(-2, 2, self.nr_items)
+        # scaling factor space
+        self.global_s = resu.local_linspace(0.1, 2, self.nr_items)
+        #
+        self.explanation = "Comparison of two different optimization heuristics (time and space). " \
+                           "In blue/green areas space optimization is better compared to the time optimization. " \
+                           "Purple/red areas are not self-consistent (not allowed) and in white areas " \
+                           "the time optimization is superior."
+
+
+    def get_default_parameters(self):
+            #
+            self.parameters = {}
+
+
+    def gen_data(self, experiment):
+        volume_min = experiment.volume
+        space_min = experiment.footprint
+        p_err = experiment.physical_error_rate
+
+        data = []
+
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                space_param = math.ceil(self.global_s[j] * space_min)
+
+                qre1 = qre.Qentiana(t_count = 0,
+                                    max_logical_qubits = space_param,
+                                    max_time_units = volume_min/space_param,
+                                    gate_err_rate = p_err)
+                ret_1 = qre1.compute_physical_resources()
+                # ret_1 = calculate_total(volume_min, space_param, p_err)
+
+                vol_param = math.ceil(self.global_v[i] * volume_min)
+                qre2 = qre.Qentiana(t_count = 0,
+                                    max_logical_qubits = space_min,
+                                    max_time_units = vol_param / space_min,
+                                    gate_err_rate = p_err)
+                ret_2 = qre2.compute_physical_resources()
+                # ret_2 = calculate_total(vol_param, space_min, p_err)
+
+                ratio = ret_2["number_of_physical_qubits"] / ret_1["number_of_physical_qubits"]
+
+                data.append({
+                    "x": self.global_s[j],
+                    "y": self.global_v[i],
+                    "dist_opt_vol": ret_1["distance"],
+                    "dist_opt_space": ret_2["distance"],
+                    "nr_target_vol": ret_1["number_of_physical_qubits"],
+                    "nr_target_space": ret_2["number_of_physical_qubits"],
+                    "ratio": ratio,
+                })
+
+        return data
+
+
+    def empty_data(self):
+        data = []
+        for i in range(len(self.global_v)):
+            for j in range(len(self.global_s)):
+                data.append({
+                    "x"             : self.global_s[j],
+                    "y"             : self.global_v[i],
+                    "dist_opt_vol"  : 0,
+                    "dist_opt_space": 0,
+                    "nr_target_vol" : 0,
+                    "nr_target_space": 0,
+                    "ratio"         : 0
+                })
+
+        return data
+
+
+    def color_interpretation(self, data):
+        component_green     = data["ratio"]
+        component_red       = data["ratio"]
+        component_blue      = data["ratio"]
+
+        # analysis = resu.analysis(data)
+
+        analysis = {"ok": True}
+
+        if analysis["ok"]:
+            component_green = 255
+        else:
+            component_red = 255
+
+        return "rgb(" + str(resu.to_rgb(component_red))\
+              + "," + str(resu.to_rgb(component_green)) \
+              + "," + resu.to_rgb(component_blue) + ")"
+
+
+# def compute_over_content(self, data):
+    #     curr_volume = resu.approx_mult_factor(data.y, experiment.volume)
+    #     curr_space = resu.approx_mult_factor(data.x, experiment.footprint)
+    #
+    #     content = ""
+    #     content += data.x + " " + data.y + "->" + data.ratio + "<br>"
+    #     content += "distance vol: " + data.dist_opt_vol + " having a hardware footprint of " + curr_space + " log qubits <br>"
+    #     content += "distance space: " + data.dist_opt_space + " for a volume of " + curr_volume + "<br>"
+    #
+    #     content += "tradeoff time scaling threshold<br>" + (data.x * data.y) + "<br>"
+    #     content += "minimum scaling should be below tradeoff threshold:<br>" + data.dist_opt_space + "<br>"
+    #
+    #     content += "<br>";
+    #     content += "qub vol: " + data["nr_target_vol"] + "<br>"
+    #     content += "qub spc: " + data["nr_target_space"] + "<br>"
+    #
+    #     return content"""
     Add some kind of computation to translate the total volume of a circuit
     to number of physical qubits and number of seconds (time unit)
-"""
-"""
-    Implementation a la Austin
+
+    ---> Implementation a la Austin
 """
 
 import math
 
 class Qentiana:
-    def __init__(self, t_count, max_logical_qubits):
+    def __init__(self, t_count, max_logical_qubits, max_time_units = 0, gate_err_rate = 0.001):
         """
-        Constructor. Considers that T-count == T-depth
+        Constructor. Considers that T-count == T-depth if max_time_units is zero
+
         :param t_count:
         :param max_logical_qubits:
+        :param max_time_units:
+        :param gate_err_rate:
         """
-
         """
             Parameters
         """
         self.parameters = {
                             # Gate error rate that sets how quickly logical errors are suppressed.
                             # 1e-3 means a factor of 10 suppression with each increase of d by 2.
-                            "characteristic_gate_error_rate" : 0.001,
+                            "characteristic_gate_error_rate" : gate_err_rate,#0.001,
                             # Time required to execute a single round of the surface code circuit detecting errors.
                             "total_surface_code_cycle_time_ns": 1000,
                             # Safety factor S means that whenever we wish to do N things reliably,
@@ -50,7 +487,19 @@ class Qentiana:
                                     "distance"      : -1}
 
         self.t_count = t_count
+        if self.t_count == 0:
+            if max_time_units != 0:
+                """
+                If the T-count was not specified, but the depth of the circuit was
+                then an approximation is to consider that the depth is T-count
+                """
+                self.t_count = math.ceil(max_time_units / self.dist_box_dimensions["t"])
+            else:
+                print("PROBLEM!!! Both t_count and max_time_units are zero! Results will be wrong!")
+
+
         self.max_logical_qubits = max_logical_qubits
+        self.max_time_units = max_time_units
 
         # A scale is the ratio between data patch qubit distance and the distillation distance
         # It effectively says how many logical qubit patches of distance d
@@ -182,9 +631,7 @@ class Qentiana:
 
     def compute_data_code_distance(self):
         """
-            Compute data code distance. Consider the maximum number of units on the time axis
-        :param t_count:
-        :param max_logical_qubits:
+        Compute data code distance. Consider the maximum number of units on the time axis
         :return:
         """
         """
@@ -193,20 +640,25 @@ class Qentiana:
         Each distillation has known number of units in time
         The distance has been computed in compute_distillation_scale_factor
         """
-        execution_rounds = self.compute_number_of_rounds(elements=self.t_count,
-                                                         element_distance=self.dist_box_dimensions["distance"],
-                                                         element_units_in_time=self.dist_box_dimensions["t"])
+        execution_rounds = self.compute_execution_rounds()
+
 
         """
         Assume that the logical qubit patches are executed in a sequence
         Each logical qubit is ONE unit long
         And each unit has a distance of execution_rounds (from the distillations)
         """
-        total_data_rounds = self.compute_number_of_rounds(elements=self.max_logical_qubits,
-                                                          element_distance=execution_rounds,
-                                                          element_units_in_time=1)
+        total_data_rounds = self.compute_number_of_rounds(elements = self.max_logical_qubits,
+                                                          element_distance = execution_rounds,
+                                                          element_units_in_time = 1)
 
-        total_data_rounds *= self.parameters["multiplication_factor_for_Clifford_domination"]
+        if self.max_time_units == 0:
+            """
+            The total execution time is not known, thus T-count is worst-case
+            If the T-count is the worst case (and max_time_units was not specified)
+            then the multiplication factor is used to determine the max_time_units
+            """
+            total_data_rounds *= self.parameters["multiplication_factor_for_Clifford_domination"]
 
         target_error_per_data_round = 1 / (self.parameters["safety_factor"] * total_data_rounds)
 
@@ -222,9 +674,9 @@ class Qentiana:
         footprint_units =  self.dist_box_dimensions["x"] *  self.dist_box_dimensions["y"]
         #
         # Number of qubits associated with a single L1 distillation.
-        l1_dist_qubits = footprint_units * self.per_patch_qubits(self.parameters["l1_distillation_code_distance_d1"])
+        l1_dist_qubits = footprint_units * self.phys_qubits_per_patch(self.parameters["l1_distillation_code_distance_d1"])
         # Number of qubits associated with a single L2 distillation.
-        l2_dist_qubits = footprint_units * self.per_patch_qubits(self.parameters["l2_distillation_code_distance_d2"])
+        l2_dist_qubits = footprint_units * self.phys_qubits_per_patch(self.parameters["l2_distillation_code_distance_d2"])
         #
         # Note that if 2 levels of distillation are required, that will be a single L2 + 8 L1 footprints.
         # See diagram above
@@ -238,45 +690,104 @@ class Qentiana:
 
         return total_dist_qubits
 
-    # def compute_physical_resources(t_count, max_logical_qubits):
-    def compute_physical_resources(self, max_time_units = 0):
+    def compute_footprint_data_qubits(self):
+        # Total number of data qubits, including communication channels.
+        # Have unit dimensions -> (1*1)
+        # before extraction in method it was the code below
+        # self.max_logical_qubits * (1*1) * Qentiana.phys_qubits_per_patch(self.parameters["data_code_distance"])
 
+        num_data_qubits = Qentiana.phys_qubits_for_all_log_qubits(self.max_logical_qubits, self.parameters["data_code_distance"])
+        return num_data_qubits
+
+
+    def compute_physical_resources(self):
         """
             Compute the number of physical qubits
         """
-        # Total number of data qubits, including communication channels.
-        # Have unit dimensions -> (1*1)
-        num_data_qubits = self.max_logical_qubits * (1*1) * self.per_patch_qubits(self.parameters["data_code_distance"])
+        num_data_qubits = self.compute_footprint_data_qubits()
         #
         # Total physical qubits required to run algorithm.
         total_qubits = self.compute_footprint_distillation_qubits() + num_data_qubits
         #
-        """
-            Compute the execution time
-            Assume T-depth is the worst case
-        """
-        execution_rounds = self.compute_number_of_rounds(elements = self.t_count,
-                                                         element_distance = self.dist_box_dimensions["distance"],
-                                                         element_units_in_time = self.dist_box_dimensions["t"])
-        if max_time_units != 0:
-            execution_rounds = self.compute_number_of_rounds(elements = max_time_units,
-                                                             element_distance = self.parameters["data_code_distance"],
-                                                             element_units_in_time = 1)
-
-
+        execution_rounds = self.compute_execution_rounds()
+        #
         execution_time_secs = execution_rounds * self.parameters["total_surface_code_cycle_time_ns"] * 0.000000001
 
-        return total_qubits, execution_time_secs
+        results = {
+                "levels"                        : self.number_of_distillation_levels,
+                "number_of_physical_qubits"     : total_qubits,
+                "time"                          : execution_time_secs,
+                "distance"                      : self.parameters["data_code_distance"]
+        }
 
+        return results
+
+    def compute_execution_rounds(self):
+        """
+            Compute the execution time
+            If max_time_units was not specified, then assume T-depth is the worst case
+        """
+        execution_rounds = self.compute_number_of_rounds(elements=self.t_count,
+                                                         element_distance=self.dist_box_dimensions["distance"],
+                                                         element_units_in_time=self.dist_box_dimensions["t"])
+        if self.max_time_units != 0:
+            # Here there is no worst-case, but a computation based on the specified parameter
+            execution_rounds = self.compute_number_of_rounds(elements=self.max_time_units,
+                                                             element_distance=self.parameters["data_code_distance"],
+                                                             element_units_in_time=1)
+        return execution_rounds
 
     """
         Counting utilities
     """
+    @staticmethod
+    def phys_qubits_for_all_log_qubits(nr_logic_qubits, distance):
+        # A previous version in Javascript counted also the qubits on the boundaries
+        # #first two because there are data and measurement qubits
+        # var tmp = space * (2 * distance * distance - 1);
+        # #add qubits on two boundaries(e.g.bottom, right)
+        # return tmp + 2 * space * (distance * 2 + 1);
+        return nr_logic_qubits * Qentiana.phys_qubits_per_patch(distance)
 
-    def per_patch_qubits(self, distance):
+
+    @staticmethod
+    def phys_qubits_per_patch(distance):
+        """
+        How many data and syndrome qubits are necessary per patch for a given distance?
+        :param distance:
+        :return:
+        """
         return 2 * (distance ** 2)
 
-    def compute_number_of_rounds(self, elements, element_distance, element_units_in_time):
+    @staticmethod
+    def distance_from_patch_phys_qubits(phys_qubits):
+        """
+        The inverse operation of phys_qubits_per_patch. Assume square patch.
+        :param phys_qubits: total data and syndrome qubits for the patch
+        :return: estimated distance available on a square patch
+        """
+        return math.floor(math.sqrt(phys_qubits/2))
+
+    @staticmethod
+    def max_distance_to_fit_log_qubits_on_phys_qubits(logical_qubits, total_physical_qubits):
+        # Calculates the maximum distance given a fixed number of physical qubits
+        # Assuming that a square number of physical qubits is necessary to encode a logical qubit
+
+        if logical_qubits > total_physical_qubits:
+            # Error: there are more logical qubits than physical
+            return -1
+
+        max_phys_qubits_per_logical = total_physical_qubits / logical_qubits
+
+        ret = Qentiana.distance_from_patch_phys_qubits(max_phys_qubits_per_logical)
+
+        if ret <= 2:
+            return 1
+
+        return ret
+
+    @staticmethod
+    def compute_number_of_rounds(elements, element_distance, element_units_in_time):
         """
         Computes for a number of sequentially executed elements, the number of error correction rounds.
         :param elements: number of elements (e.g. distillation procedures)
@@ -291,7 +802,8 @@ class Qentiana:
     Do While translated to simple while, because condition was after DO
     """
 
-    def vba_levels(self, p_in, p_out):
+    @staticmethod
+    def vba_levels(p_in, p_out):
         n = 0
         while p_in > p_out:
             n = n + 1
@@ -299,20 +811,20 @@ class Qentiana:
         # levels = n
         return n
 
-
-    def vba_p_logical(self, p_gate, d):
+    @staticmethod
+    def vba_p_logical(p_gate, d):
         return 0.1 * (100 * p_gate) ** ((d + 1) / 2)
 
-
-    def vba_distance(self, p_gate, p_l):
+    @staticmethod
+    def vba_distance(p_gate, p_l):
         d = 3
-        while self.vba_p_logical(p_gate, d) > p_l:
+        while Qentiana.vba_p_logical(p_gate, d) > p_l:
             d = d + 2
         # distance = d
         return d
 
-
-    def vba_distillation_p_out(self, p_in, xxx_levels):
+    @staticmethod
+    def vba_distillation_p_out(p_in, xxx_levels):
         n = 0
         while n < xxx_levels:
             n = n + 1

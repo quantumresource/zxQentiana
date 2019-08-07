@@ -1,3 +1,5 @@
+include ../Makefile.globals.mk
+
 .PHONY: all clean
 all: interface.js
 

@@ -13,54 +13,54 @@ var formatTick = function(d) {
     return 10 + (d < 0 ? "⁻" : "") + formatPower(Math.round(Math.log(d) / Math.LN10));
 };
 
-function approx_mult_factor(factor, value) {
-    // return Math.round(factor * value)
-    return Math.ceil(factor * value);
-}
+// function approx_mult_factor(factor, value) {
+//     // return Math.round(factor * value)
+//     return Math.ceil(factor * value);
+// }
 
-function local_logspace(start, stop, num = 50) {
-    //assume base = 10
-    var ret = new Array(num + 1);
+// function local_logspace(start, stop, num = 50) {
+//     //assume base = 10
+//     var ret = new Array(num + 1);
 
-    var delta = (stop - start) / num;
-    for (var i = 0; i < num + 1; i++) {
-        ret[i] = Math.pow(10, start + delta * i);
-    }
+//     var delta = (stop - start) / num;
+//     for (var i = 0; i < num + 1; i++) {
+//         ret[i] = Math.pow(10, start + delta * i);
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
-function local_linspace(start, stop, num = 50) {
-    var ret = new Array(num);
+// function local_linspace(start, stop, num = 50) {
+//     var ret = new Array(num);
 
-    var delta = (stop - start) / num;
-    for (var i = 0; i < num; i++) {
-        ret[i] = start + delta * i;
-    }
+//     var delta = (stop - start) / num;
+//     for (var i = 0; i < num; i++) {
+//         ret[i] = start + delta * i;
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
-function local_linspace_2(middle, plus_minus_range, num = 50) {
-    // assume num is odd
-    if (num % 2 == 0) {
-        //make odd
-        num += 1;
-    }
+// function local_linspace_2(middle, plus_minus_range, num = 50) {
+//     // assume num is odd
+//     if (num % 2 == 0) {
+//         //make odd
+//         num += 1;
+//     }
 
-    var ret = new Array(num);
-    var middle_index = Math.floor(num / 2);
-    ret[middle_index] = middle;
+//     var ret = new Array(num);
+//     var middle_index = Math.floor(num / 2);
+//     ret[middle_index] = middle;
 
-    var float_ratio = (2 * plus_minus_range) / num;
-    var half_distance = middle_index;
-    for (var i = 1; i <= half_distance; i++) {
-        ret[middle_index + i] = middle + i * float_ratio;
-        ret[middle_index - i] = middle - i * float_ratio;
-    }
+//     var float_ratio = (2 * plus_minus_range) / num;
+//     var half_distance = middle_index;
+//     for (var i = 1; i <= half_distance; i++) {
+//         ret[middle_index + i] = middle + i * float_ratio;
+//         ret[middle_index - i] = middle - i * float_ratio;
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
 function create_2d_array(dim1, dim2) {
     var ret = new Array(dim1);
@@ -110,20 +110,27 @@ function from_rgb(param) {
 function create_description(elem_name, text) {
     // this.explanation = "Given a fixed number of physical qubits, what is the total success probability? The higher the probability the lighter color.";
 
-    var desc = document.createElement("div");
+    // var desc = document.createElement("div");
 
-    desc.appendChild(document.createTextNode(text));
-    desc.appendChild(document.createElement("br"));
-    desc.setAttribute("class", "description");
+    // desc.appendChild(document.createTextNode(text));
+    // desc.appendChild(document.createElement("br"));
+    // desc.setAttribute("class", "description");
 
-    var alink = document.createElement("a");
-    alink.setAttribute("href", "#");
-    alink.setAttribute("onclick", "save_as_svg(\"plotsvg" + elem_name + "\")");
-    alink.innerHTML = "Download SVG";
-    desc.appendChild(alink);
+    // var alink = document.createElement("a");
+    // alink.setAttribute("href", "#");
+    // alink.setAttribute("onclick", "save_as_svg(\"plotsvg" + elem_name + "\")");
+    // alink.innerHTML = "Download SVG";
+    // desc.appendChild(alink);
 
-    var container = document.getElementsByClassName(elem_name)[0];
-    container.appendChild(desc);
+    // var container = document.getElementsByClassName(elem_name)[0];
+    // container.appendChild(desc);
+
+    document.getElementById(elem_name+"desc").innerText = text;
+}
+
+function get_container_dimension(containerID, dimName)
+{
+    return document.getElementsByClassName(containerID)[0].parentElement[dimName];
 }
 
 function create_parameter(elem_name, param_name, param_default_value) {
@@ -133,32 +140,34 @@ function create_parameter(elem_name, param_name, param_default_value) {
         return;
     }
 
-    var container = document.getElementsByClassName(elem_name)[0];
-
-    container.appendChild(document.createElement("br"));
+    // var container = document.getElementsByClassName(elem_name)[0];
+    var container = document.getElementById(elem_name + "params")
 
     var divcont = document.createElement("div");
     divcont.setAttribute("class", "description");
     divcont.appendChild(document.createTextNode(param_name));
 
-    var input = document.createElement("input");
-    input.setAttribute("onchange", "update_plots()");
+    var inputx = document.createElement("input");
+    inputx.setAttribute("onchange", "update_plots()");
+
+    inputx.setAttribute("id", elem_name + "_" + param_name);
+    inputx.setAttribute("name", elem_name + "_" + param_name);
+
+    container.appendChild(divcont);
+    var elementinput = divcont.appendChild(inputx);
 
     if (is_bool_parameter(param_name)) {
-        input.setAttribute("type", "checkbox");
+        elementinput.type = "checkbox";
         if (parseBool(param_default_value)) {
-            input.setAttribute("checked", true);
+            elementinput.checked = true;
+
+            console.log(elementinput.checked);
         }
     } else {
-        input.setAttribute("type", "number");
-        input.setAttribute("step", "1");
-        input.setAttribute("value", param_default_value);
+        elementinput.type = "number";
+        elementinput.step = "1";
+        elementinput.value = param_default_value;
     }
-
-    input.setAttribute("id", elem_name + "_" + param_name);
-
-    divcont.appendChild(input);
-    container.appendChild(divcont);
 }
 
 function read_parameter(elem_name, param_name) {
@@ -173,6 +182,31 @@ function read_parameter(elem_name, param_name) {
     }
 
     return ret;
+}
+
+function update_vis_dimensions(options, plot_name, nr_items)
+{
+    //Compute the width and height percentages based on the margins
+    options.width = 100 - (options.margin.left + options.margin.right);
+    options.height = 100 - (options.margin.top + options.margin.bottom);
+    
+    //Determine the min value of the chart
+    cheight = get_container_dimension(plot_name.substring(1), "offsetHeight");
+    cwidth = get_container_dimension(plot_name.substring(1), "offsetWidth");
+
+    minsize = Math.min(cheight, cwidth);
+    minsize *= (options.width/100.0);
+
+    options.itemSize = (minsize / nr_items);
+
+    //Compute margins in pixels
+    options.marginpx = { 
+        top: options.margin.top * minsize/100.0, 
+        right: options.margin.right * minsize/100.0, 
+        bottom: options.margin.bottom * minsize/100.0, 
+        left: options.margin.left * minsize/100.0};
+
+    //
 }
 
 function set_parameter(elem_name, param_name, value) {

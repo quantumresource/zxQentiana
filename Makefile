@@ -1,57 +1,73 @@
-# needs to be the command for the python 3 interpreter
-# python 2 is not supported
-export PYTHON = python3
-
-# either absolute path or relative path with additional ../ because it is called in a subdirectory
-# the path to the local git repo of pyodide
-# we do not compile it, but use tools from the repo
-# the compiled version is downloaded...see belowa
-export PYODIDE_PATH = /home/alexandru/pyodide
+include Makefile.globals.mk
 
 # from where should the pyodide build be downloaded?
-export PYODIDE_BUILD = https://github.com/iodide-project/pyodide/releases/download/0.13.0/pyodide-build-0.13.0.tar.bz2
+PYODIDE_COMPILED = https://github.com/iodide-project/pyodide/releases/download/0.13.0/pyodide-build-0.13.0.tar.bz2
+# to which directory should it be saved?
+PYODIDE_BUILD = pyodide_build
+# File name of Pyodide distro to save to
+PYODIDE_FILE_NAME = pyodide_build.tar.bz2
+
+# The directory where pyZX should be downloaded and compiled
+PYODIDE_ZX_PATH = pyodide_zx
+
+# The directory where Qentiana should be downloaded
+QENTIANA_PATH = qentiana
+
+# The path where the compiled/transpiled code should be copied
+# For the moment I am not using the entire Pyodide stack in order to speed up loading times
+# This path is also used in index.html for loading pyodide and the libraries
+SITEFILES_PATH = githubiofiles
+
+.PHONY: all clean serve pyzx package qentiana #interface
+
+#all: githubiofiles/packages.json pyodide_build/pyodide.js pyodide_zx/pyzx.data qentiana/cube_to_physical.js
+all: pyzx qentiana package | ${PYODIDE_BUILD}
+
+# packages: pyodide_build/pyodide.js ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/cube_to_physical.% interface/interface.%
+package: ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/cube_to_physical.% #interface/interface.%
+	# mkdir -p website_files
+	# The packaging is not completely solved. Comment the next two line...
+	# mkdir -p ${SITEFILES_PATH}
+	# cp pyodide_build/* ${SITEFILES_PATH}
+	#
+	# cp pyodide_zx/pyzx.data pyodide_zx/pyzx.js website_files
+	# cp qentiana_build/cube_to_physical.js qentiana_build/cube_to_physical.data website_files
+	# cp interface/packages.json interface/interface.js interface/interface.data website_files
+	#
+${PYODIDE_ZX_PATH}/pyzx.% :
+	# Copy the new pyZX
+	cp ${PYODIDE_ZX_PATH}/pyzx.data ${PYODIDE_ZX_PATH}/pyzx.js ${SITEFILES_PATH}
+
+${QENTIANA_PATH}/cube_to_physical.%	:
+# Copy the new Qentiana
+	cp ${QENTIANA_PATH}/cube_to_physical.js ${QENTIANA_PATH}/cube_to_physical.data ${SITEFILES_PATH}
+
+# interface/interface.% :
+# 	cp interface/packages.json interface/interface.js interface/interface.data ${SITEFILES_PATH}
 
 
-.PHONY: all clean serve pyodide_zx
+pyzx: ${PYODIDE_ZX_PATH}
+	$(MAKE) -I ${PWD} -C ${PYODIDE_ZX_PATH}
 
-all: website_files/packages.json pyodide_build/pyodide.js pyodide_zx/pyzx.data
-
-
-website_files/packages.json: pyodide_build/pyodide.js pyodide_zx/pyzx.data qentiana_build/cube_to_physical.js interface/interface.js
-	mkdir -p website_files
-	cp pyodide_build/* website_files
-	cp pyodide_zx/pyzx.data pyodide_zx/pyzx.js website_files
-	cp qentiana_build/cube_to_physical.js qentiana_build/cube_to_physical.data website_files
-	cp interface/packages.json interface/interface.js interface/interface.data website_files
+${PYODIDE_BUILD}:
+	mkdir -p ${PYODIDE_BUILD}
+	wget $(PYODIDE_COMPILED) --output-document ${PYODIDE_FILE_NAME}
+	tar -C ${PYODIDE_BUILD}/ -xvf ${PYODIDE_FILE_NAME}
+	rm ${PYODIDE_FILE_NAME}
 
 
-pyodide_zx/pyzx.data: pyodide_zx/Makefile
-	$(MAKE) -C pyodide_zx
-
-pyodide_build/pyodide.js:
-	mkdir -p pyodide_build
-	# if wget fails, the download should be rm-ed
-	wget $(PYODIDE_BUILD) --output-document pyodide_build.tar.bz2
-	#if [ $? -ne 0 ]
-  	#	then echo "--> Wget failed"
-  	#	else echo "--> Wget OK"
-	#fi
-
-	tar -C pyodide_build/ -xvf pyodide_build.tar.bz2
-	rm pyodide_build.tar.bz2
-
-qentiana_build/cube_to_physical.js: qentiana_build/Makefile
-	$(MAKE) -C qentiana_build
+qentiana:
+	$(MAKE) -I ${PWD} -C ${QENTIANA_PATH}
 
 
-interface/interface.js: interface/Makefile interface/packages.json
-	$(MAKE) -C interface
+# interface:
+# 	$(MAKE) -I ${PWD} -C interface
 
 serve:
 	$(PYTHON) run_website.py
 
 clean:
-	$(MAKE) -C pyodide_zx clean
-	$(MAKE) -C qentiana_build clean
-	$(MAKE) -C interface clean
-	rm -r pyodide_build website_files
+	$(MAKE) -I . -C ${PYODIDE_ZX_PATH} clean
+	$(MAKE) -I . -C ${QENTIANA_PATH} clean
+	$(MAKE) -I . -C interface clean
+	#rm -r pyodide_build website_files

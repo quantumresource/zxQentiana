@@ -12,8 +12,11 @@ function Gaensebluemchen(name, vis_options) {
     // name of the div
     this.plot_name = name;
     //
-    this.options = vis_options;
     //
+    this.options = Object.create(vis_options);
+
+    update_vis_dimensions(this.options, this.plot_name, this.nr_items);
+
     this.console_text = "";
     var ref = this;
 
@@ -39,7 +42,6 @@ function Gaensebluemchen(name, vis_options) {
 
     this.explanation = "Tradeoff between volume and total number of physical qubits. Vertical lines are changes in distance.";
     
-
     this.parameters = {};
 
     this.parameters["bool_update_plot"] = true;
@@ -275,21 +277,22 @@ Gaensebluemchen.prototype.init_visualisation = function() {
 
     var svg = d3.select(this.plot_name)
         .append("svg")
-        .attr("width", ref.options.width + ref.options.margin.left + ref.options.margin.right)
-        .attr("height", ref.options.height + ref.options.margin.top + ref.options.margin.bottom)
+        .attr("width", (ref.options.width + ref.options.margin.left + ref.options.margin.right) + "%")
+        .attr("height", (ref.options.height + ref.options.margin.top + ref.options.margin.bottom) + "%")
         .append("g")
         .attr("id", "plotsvg" + ref.plot_name.replace(".", ""))
-        .attr("transform", "translate(" + ref.options.margin.left + "," + ref.options.margin.top + ")");
+        .attr("transform", "translate(" + ref.options.marginpx.left + "," + ref.options.marginpx.top + ")");
 
     this.update_data();
-    set_parameter(this.plot_name.replace(".", ""),"bool_update_plot",false);
+
+    var cellSize = (ref.options.itemSize + 1)/2;
 
     svg.append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(0, " + (ref.options.cellSize / 2) + ")")
+        .attr("transform", "translate(0, " + cellSize + ")")
         .call(ref.yAxis)
         .selectAll('text')
-        .attr('font-weight', 'normal');
+        .attr('font-weight', 'normal')
 
     svg.append("g")
         .attr("class", "x axis")
@@ -297,7 +300,7 @@ Gaensebluemchen.prototype.init_visualisation = function() {
         .call(ref.xAxis)
         .selectAll('text')
         .attr('font-weight', 'normal')
-        .style("text-anchor", "start");
+        .style("text-anchor", "start")
 
     // now add titles to the axes
     var movey = (this.y_axis.length + 1) * this.options.itemSize;
@@ -305,26 +308,28 @@ Gaensebluemchen.prototype.init_visualisation = function() {
 
     svg.append("text")
         .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate(" + (-ref.options.margin.left / 2) + "," + (movex / 2) + ")rotate(-90)") // text is drawn off the screen top left, move down and out and rotate
+        .attr("transform", "translate(" + (-ref.options.marginpx.left / 2) + "," + (movex / 2) + ")rotate(-90)") // text is drawn off the screen top left, move down and out and rotate
         .text("Total qubits");
 
     svg.append("text")
         .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate(" + (movex / 2) + "," + (movey + (2*ref.options.margin.bottom)) + ")") // centre below axis
+        .attr("transform", "translate(" + (movex / 2) + "," + (movey + ref.options.marginpx.top + ref.options.marginpx.bottom/2 ) + ")") // centre below axis
         .text("Volume Factor");
 
 
     // add mouseover events
     var mouseG = svg.append("g").attr("class", "mouse-over-effects");
 
+    var local_console = document.getElementById(this.plot_name.substring(1) + "console");
+
     mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-        .attr('width', ref.options.width) // can't catch mouse events on a g element
-        .attr('height', ref.options.height)
+        .attr('width', ref.options.width + "%") // can't catch mouse events on a g element
+        .attr('height', ref.options.height + "%")
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
         .on('mouseout', qentMouse.mouseOut)
         .on('mouseover', function() {
-            qentMouse.mouseOver(ref.console_text);
+            qentMouse.mouseOver(local_console, ref.console_text);
         })
         .on('mousemove', qentMouse.mouseMove);
 }
@@ -400,6 +405,8 @@ Gaensebluemchen.prototype.store_min_max_y = function(y_val) {
 
 Gaensebluemchen.prototype.update_y_axis = function(data) {
     var ref = this;
+    //
+    var cellSize = (ref.options.itemSize + 1)/2;
     // 
     this.reset_min_max_y();
     for (var i = 0; i < data.length; i++) {
@@ -431,7 +438,7 @@ Gaensebluemchen.prototype.update_y_axis = function(data) {
     //append the new one
     d3.select("#plotsvg" + ref.plot_name.replace(".", "")).append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(0, " + (ref.options.cellSize / 2) + ")")
+        .attr("transform", "translate(0, " + cellSize + ")")
         .call(ref.yAxis)
         .selectAll('text')
         .attr('font-weight', 'normal');
