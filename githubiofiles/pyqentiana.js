@@ -20,8 +20,8 @@ Module.expectedDataFileDownloads++;
     } else {
       throw 'using preloaded data can only be done on a web page or in a web worker';
     }
-    var PACKAGE_NAME = 'pyzx.data';
-    var REMOTE_PACKAGE_BASE = 'pyzx.data';
+    var PACKAGE_NAME = 'pyqentiana.data';
+    var REMOTE_PACKAGE_BASE = 'pyqentiana.data';
     if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
       Module['locateFile'] = Module['locateFilePackage'];
       err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -103,10 +103,7 @@ Module.expectedDataFileDownloads++;
 Module['FS_createPath']('/', 'lib', true, true);
 Module['FS_createPath']('/lib', 'python3.7', true, true);
 Module['FS_createPath']('/lib/python3.7', 'site-packages', true, true);
-Module['FS_createPath']('/lib/python3.7/site-packages', 'pyzx', true, true);
-Module['FS_createPath']('/lib/python3.7/site-packages/pyzx', 'scripts', true, true);
-Module['FS_createPath']('/lib/python3.7/site-packages/pyzx', 'routing', true, true);
-Module['FS_createPath']('/lib/python3.7/site-packages/pyzx', 'graph', true, true);
+Module['FS_createPath']('/lib/python3.7/site-packages', 'pyqentiana', true, true);
 
     function DataRequest(start, end, audio) {
       this.start = start;
@@ -165,10 +162,10 @@ Module['FS_createPath']('/lib/python3.7/site-packages/pyzx', 'graph', true, true
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
           }
-              Module['removeRunDependency']('datafile_pyzx.data');
+              Module['removeRunDependency']('datafile_pyqentiana.data');
 
     };
-    Module['addRunDependency']('datafile_pyzx.data');
+    Module['addRunDependency']('datafile_pyqentiana.data');
   
     if (!Module.preloadResults) Module.preloadResults = {};
   
@@ -189,6 +186,6 @@ Module['FS_createPath']('/lib/python3.7/site-packages/pyzx', 'graph', true, true
   }
 
  }
- loadPackage({"files": [{"filename": "/lib/python3.7/site-packages/pyzx/rules.py", "start": 0, "end": 27450, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/todd.py", "start": 27450, "end": 45135, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/io.py", "start": 45135, "end": 51833, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/optimize.py", "start": 51833, "end": 83482, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/quantomatic.py", "start": 83482, "end": 89987, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/__init__.py", "start": 89987, "end": 91275, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/generate.py", "start": 91275, "end": 104089, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/simplify.py", "start": 104089, "end": 127065, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/pyquil_circuit.py", "start": 127065, "end": 131131, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/d3.py", "start": 131131, "end": 134638, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/drawing.py", "start": 134638, "end": 141573, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/linalg_c.pyx", "start": 141573, "end": 154123, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/gflow.py", "start": 154123, "end": 156831, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/tensor.py", "start": 156831, "end": 164264, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/tikz.py", "start": 164264, "end": 169190, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/circuit.py", "start": 169190, "end": 212995, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/linalg.py", "start": 212995, "end": 229307, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/extract.py", "start": 229307, "end": 271552, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/__main__.py", "start": 271552, "end": 273719, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/phasepoly.py", "start": 273719, "end": 292251, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/scripts/__init__.py", "start": 292251, "end": 292251, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/scripts/cnot_mapper.py", "start": 292251, "end": 312271, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/scripts/circ2circ.py", "start": 312271, "end": 316366, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/scripts/circ2tikz.py", "start": 316366, "end": 318367, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/routing/__init__.py", "start": 318367, "end": 319221, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/routing/parity_maps.py", "start": 319221, "end": 325147, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/routing/machine_learning.py", "start": 325147, "end": 331038, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/routing/steiner.py", "start": 331038, "end": 334981, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/routing/architecture.py", "start": 334981, "end": 355807, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/graph_gt.py", "start": 355807, "end": 358474, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/__init__.py", "start": 358474, "end": 359328, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/graph.py", "start": 359328, "end": 361060, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/graph_s.py", "start": 361060, "end": 367238, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/graph_ig.py", "start": 367238, "end": 371552, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyzx/graph/base.py", "start": 371552, "end": 394958, "audio": 0}], "remote_package_size": 394958, "package_uuid": "2fafa27c-1dbb-4dbd-bf17-3c60892e5e71"});
+ loadPackage({"files": [{"filename": "/lib/python3.7/site-packages/pyqentiana/phys_qubits_vs_log_err.py", "start": 0, "end": 4143, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/res_utils.py", "start": 4143, "end": 6459, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/res_savings.py", "start": 6459, "end": 10772, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/distance_bins.py", "start": 10772, "end": 10823, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/time_vs_space.py", "start": 10823, "end": 15422, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/__init.py__", "start": 15422, "end": 15422, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/cube_to_physical.py", "start": 15422, "end": 33956, "audio": 0}], "remote_package_size": 33956, "package_uuid": "280de628-580e-4e01-af2c-2be5cca54de7"});
 
 })();

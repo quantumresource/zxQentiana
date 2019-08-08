@@ -24,7 +24,7 @@ SITEFILES_PATH = githubiofiles
 all: pyzx qentiana package | ${PYODIDE_BUILD}
 
 # packages: pyodide_build/pyodide.js ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/cube_to_physical.% interface/interface.%
-package: ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/cube_to_physical.% #interface/interface.%
+package: ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/pyqentiana.% #interface/interface.%
 	# mkdir -p website_files
 	# The packaging is not completely solved. Comment the next two line...
 	# mkdir -p ${SITEFILES_PATH}
@@ -38,9 +38,9 @@ ${PYODIDE_ZX_PATH}/pyzx.% :
 	# Copy the new pyZX
 	cp ${PYODIDE_ZX_PATH}/pyzx.data ${PYODIDE_ZX_PATH}/pyzx.js ${SITEFILES_PATH}
 
-${QENTIANA_PATH}/cube_to_physical.%	:
-# Copy the new Qentiana
-	cp ${QENTIANA_PATH}/cube_to_physical.js ${QENTIANA_PATH}/cube_to_physical.data ${SITEFILES_PATH}
+${QENTIANA_PATH}/pyqentiana.%	:
+	# Copy the new Qentiana
+	cp ${QENTIANA_PATH}/pyqentiana.js ${QENTIANA_PATH}/pyqentiana.data ${SITEFILES_PATH}
 
 # interface/interface.% :
 # 	cp interface/packages.json interface/interface.js interface/interface.data ${SITEFILES_PATH}

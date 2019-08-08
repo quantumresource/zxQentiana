@@ -6,17 +6,18 @@ include Makefile.globals.mk
 
 STORE_FOLDER = pyqentiana
 REPOSITORY_URL = https://raw.githubusercontent.com/alexandrupaler/opensurgery/master/resanalysis
-COMPILE_NAME = cube_to_physical
+COMPILE_NAME = pyqentiana
 
 all: compile
 
 compile: ${STORE_FOLDER}/%.py
 
 ${STORE_FOLDER}/%.py: | ${STORE_FOLDER}
-	${PYTHON} ${PYODIDE_PATH}/tools/file_packager.py ${COMPILE_NAME}.data --js-output=${COMPILE_NAME}.js --preload ${STORE_FOLDER}@/lib/python3.7/site-packages/ --abi=1 --export-name=pyodide._module --exclude __pycache__ --use-preload-plugins
+	${PYTHON} ${PYODIDE_PATH}/tools/file_packager.py ${COMPILE_NAME}.data --js-output=${COMPILE_NAME}.js --preload ${STORE_FOLDER}@/lib/python3.7/site-packages/${STORE_FOLDER} --abi=1 --export-name=pyodide._module --exclude __pycache__ --use-preload-plugins
 
 ${STORE_FOLDER}:
 	mkdir -p ${STORE_FOLDER}
+	touch ${STORE_FOLDER}/__init.py__
 	wget ${REPOSITORY_URL}/cube_to_physical.py -P ${STORE_FOLDER}
 	wget ${REPOSITORY_URL}/distance_bins.py -P ${STORE_FOLDER}
 	wget ${REPOSITORY_URL}/phys_qubits_vs_log_err.py -P ${STORE_FOLDER}

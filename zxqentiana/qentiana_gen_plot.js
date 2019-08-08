@@ -32,8 +32,9 @@ function GeneralPlot(data_obj, name, vis_options) {
     // 
     create_description(this.plot_name.replace(".", ""), this.data_obj.explanation);
 
-    for (key in this.data_obj.parameters) {
-        create_parameter(this.plot_name.replace(".", ""), key, this.data_obj.parameters[key]);
+    var ppp = this.data_obj.get_default_parameters()
+    for (key in ppp) {
+        create_parameter(this.plot_name.replace(".", ""), key, ppp[key]);
     }
 }
 
@@ -96,34 +97,36 @@ GeneralPlot.prototype.init_visualisation = function() {
             return ref.data_obj.color_interpretation(d);
         })
         .on('mouseover', function(d) {
-            content = ref.data_obj.compute_over_content(d);
+            content = ref.data_obj.explain_data(d, experiment);
             qentMouse.mouseOver(local_console, content);
         })
         .on('mousemove', qentMouse.mouseMove)
         .on('mouseout', qentMouse.mouseOut);
-
-    this.update_data();
 }
 
 GeneralPlot.prototype.collect_parameters = function()
 {
+    params = {}
+    
     for (key in this.data_obj.parameters) {
         if (!is_internal_parameter(key)) {
-            this.data_obj.parameters[key] = read_parameter(this.plot_name.replace(".", ""), key);
+            params[key] = read_parameter(this.plot_name.replace(".", ""), key);
         }
     }
+
+    return params;
 }
 
-GeneralPlot.prototype.update_data = function() {
+GeneralPlot.prototype.update_data = function(experiment) {
     var ref = this;
 
-    this.collect_parameters();
+    var params = this.collect_parameters();
 
     var data = [];
 
-    if (this.data_obj.parameters["bool_update_plot"]) {
+    if (params["bool_update_plot"]) {
         console.log("update " + this.plot_name);
-        data = this.data_obj.gen_data();
+        data = this.data_obj.gen_data(experiment, params);
     }
     else
     {

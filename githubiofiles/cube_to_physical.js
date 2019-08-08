@@ -103,6 +103,7 @@ Module.expectedDataFileDownloads++;
 Module['FS_createPath']('/', 'lib', true, true);
 Module['FS_createPath']('/lib', 'python3.7', true, true);
 Module['FS_createPath']('/lib/python3.7', 'site-packages', true, true);
+Module['FS_createPath']('/lib/python3.7/site-packages', 'pyqentiana', true, true);
 
     function DataRequest(start, end, audio) {
       this.start = start;
@@ -185,6 +186,6 @@ Module['FS_createPath']('/lib/python3.7', 'site-packages', true, true);
   }
 
  }
- loadPackage({"files": [{"filename": "/lib/python3.7/site-packages/phys_qubits_vs_log_err.py", "start": 0, "end": 4265, "audio": 0}, {"filename": "/lib/python3.7/site-packages/res_utils.py", "start": 4265, "end": 6587, "audio": 0}, {"filename": "/lib/python3.7/site-packages/res_savings.py", "start": 6587, "end": 11087, "audio": 0}, {"filename": "/lib/python3.7/site-packages/distance_bins.py", "start": 11087, "end": 11138, "audio": 0}, {"filename": "/lib/python3.7/site-packages/time_vs_space.py", "start": 11138, "end": 15750, "audio": 0}, {"filename": "/lib/python3.7/site-packages/cube_to_physical.py", "start": 15750, "end": 34282, "audio": 0}], "remote_package_size": 34282, "package_uuid": "c16d8abc-2550-4b03-bbc6-62c014c83628"});
+ loadPackage({"files": [{"filename": "/lib/python3.7/site-packages/pyqentiana/phys_qubits_vs_log_err.py", "start": 0, "end": 4127, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/res_utils.py", "start": 4127, "end": 6448, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/res_savings.py", "start": 6448, "end": 10755, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/distance_bins.py", "start": 10755, "end": 10806, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/time_vs_space.py", "start": 10806, "end": 15405, "audio": 0}, {"filename": "/lib/python3.7/site-packages/pyqentiana/cube_to_physical.py", "start": 15405, "end": 33939, "audio": 0}], "remote_package_size": 33939, "package_uuid": "685c1a21-33cd-4272-ac76-5c277a9ff8a8"});
 
 })();
