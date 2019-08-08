@@ -72,28 +72,21 @@
                 xmlhttp.open('GET', 'zxqentiana/python_call_000.py', false);
                 xmlhttp.send();
                 //load codemirror python script
-                myCodeMirror.setValue(xmlhttp.responseText);
+                myCodeMirror000.setValue(xmlhttp.responseText);
+
+                //load the script in the texteditor
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open('GET', 'zxqentiana/python_call_001.py', false);
+                xmlhttp.send();
+                //load codemirror python script
+                myCodeMirror001.setValue(xmlhttp.responseText);
 
                 /*Execute the first Python*/
-                runscript();
+                runscript(myCodeMirror000);
 
                 firstrun();
             });
         });
-
-        // function calculate_total(volume, space, p_cycle_err) {
-        //     var ret_obj = {
-        //         dist: -1,
-        //         number_of_physical_qubits: -1
-        //     };
-
-        //     var res = austin_data_qubits(space, volume, experiment.safety_factor, p_cycle_err);
-
-        //     ret_obj.dist = res.distance;
-        //     ret_obj.number_of_physical_qubits = res.qubits;
-
-        //     return ret_obj;
-        // }
     </script>
 </head>
 
@@ -148,7 +141,7 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="javascript:runscript()">
+                <a class="nav-link" href="javascript:runscript(myCodeMirror001)">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Generate a random circuit with the above parameters</span>
                 </a>
@@ -211,13 +204,23 @@
                     </div> -->
                     
                     <div class="row" id="divscript">
-                        <!-- Card Header - Accordion -->
-                        <a href="#collapseScript" class="d-block card-header py-3" data-toggle="collapse" role="button"
-                            aria-expanded="true" aria-controls="collapseScript">
-                            <h6 class="m-0 font-weight-bold text-primary">Python Script</h6>
+                        <a href="#collapseScript1" class="d-block card-header py-3" data-toggle="collapse" role="button"
+                            aria-expanded="true" aria-controls="collapseScript1">
+                            <h6 class="m-0 font-weight-bold text-primary">Python Script - Boot</h6>
                         </a>
-                        <div class="collapse show col-lg-12" id="collapseScript">
-                            <textarea name="txt_script" id="txt_script">
+                        <div class="collapse col-lg-12" id="collapseScript1">
+                            <textarea name="txt_script_1" id="txt_script_1">
+                            </textarea>
+                        </div>
+                    </div>
+
+                    <div class="row" id="divscript">
+                        <a href="#collapseScript2" class="d-block card-header py-3" data-toggle="collapse" role="button"
+                            aria-expanded="true" aria-controls="collapseScript2">
+                            <h6 class="m-0 font-weight-bold text-primary">Python Script - Play with ZX</h6>
+                        </a>
+                        <div class="collapse show col-lg-12" id="collapseScript2">
+                            <textarea name="txt_script_2" id="txt_script_2">
                             </textarea>
                         </div>
                     </div>
@@ -231,13 +234,12 @@
                         <div class="col-lg-6">
                             <div class="card shadow mb-6">
                                 <!-- Card Header - Accordion -->
-                                <a href="#collapsePlot1" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="collapsePlot1">
-                                    <h6 class="m-0 font-weight-bold text-primary" id="plot1desc">Collapsable Card
-                                        Example</h6>
+                                <a href="#collapse_plot1" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapse_plot1">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot1title">Plot</h6>
                                 </a>
                                 <!-- Card Content - Collapse -->
-                                <div class="collapse show row py-3" id="collapsePlot1">
+                                <div class="collapse show row py-3" id="collapse_plot1">
                                     <div class="card-body col-sm-6" style="height:20vw">
                                         <div class="plot1 chart">
                                             <!-- Here should be the plot -->
@@ -249,6 +251,8 @@
 
                                     <div class="card-body col-lg-12" id="plot1params">
                                     </div>
+                                    <div class="card-body col-lg-12" id="plot1desc">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -256,13 +260,12 @@
                         <div class="col-lg-6">
                             <div class="card shadow mb-6">
                                 <!-- Card Header - Accordion -->
-                                <a href="#collapsePlot2" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="collapsePlot2">
-                                    <h6 class="m-0 font-weight-bold text-primary" id="plot2desc">Collapsable Card
-                                        Example</h6>
+                                <a href="#collapse_plot2" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapse_plot2">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot2title">Plot</h6>
                                 </a>
                                 <!-- Card Content - Collapse -->
-                                <div class="collapse show row py-3" id="collapsePlot2">
+                                <div class="collapse show row py-3" id="collapse_plot2">
                                     <div class="card-body col-sm-6" style="height:20vw">
                                         <div class="plot2 chart">
                                             <!-- Here should be the plot -->
@@ -274,6 +277,8 @@
                                     <div class="card-body col-lg-12" id="plot2params">
 
                                     </div>
+                                    <div class="card-body col-lg-12" id="plot2desc">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -283,13 +288,12 @@
                         <div class="col-lg-6">
                             <div class="card shadow mb-6">
                                 <!-- Card Header - Accordion -->
-                                <a href="#collapsePlot3" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="collapsePlot3">
-                                    <h6 class="m-0 font-weight-bold text-primary" id="plot3desc">Collapsable Card
-                                        Example</h6>
+                                <a href="#collapse_plot3" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapse_plot3">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot3title">Plot</h6>
                                 </a>
                                 <!-- Card Content - Collapse -->
-                                <div class="collapse show row py-3" id="collapsePlot3">
+                                <div class="collapse show row py-3" id="collapse_plot3">
                                     <div class="card-body col-sm-6" style="height:20vw">
                                         <div class="plot3 chart">
                                             <!-- Here should be the plot -->
@@ -299,7 +303,8 @@
 
                                     </div>
                                     <div class="card-body col-lg-12" id="plot3params">
-
+                                    </div>
+                                    <div class="card-body col-lg-12" id="plot3desc">
                                     </div>
                                 </div>
                             </div>
@@ -307,13 +312,12 @@
                         <div class="col-lg-6">
                             <div class="card shadow mb-6">
                                 <!-- Card Header - Accordion -->
-                                <a href="#collapsePlot4" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="collapsePlot4">
-                                    <h6 class="m-0 font-weight-bold text-primary" id="plot4desc">Collapsable Card
-                                        Example</h6>
+                                <a href="#collapse_plot4" class="d-block card-header py-3" data-toggle="collapse"
+                                    role="button" aria-expanded="true" aria-controls="collapse_plot4">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="plot4title">Plot</h6>
                                 </a>
                                 <!-- Card Content - Collapse -->
-                                <div class="collapse show show row py-3" id="collapsePlot4">
+                                <div class="collapse show show row py-3" id="collapse_plot4">
                                     <div class="card-body col-sm-6" style="height:20vw">
                                         <div class="plot4 chart">
                                             <!-- Here should be the plot -->
@@ -323,6 +327,8 @@
 
                                     </div>
                                     <div class="card-body col-lg-12" id="plot4params">
+                                    </div>
+                                    <div class="card-body col-lg-12" id="plot4desc">
                                     </div>
                                 </div>
                             </div>

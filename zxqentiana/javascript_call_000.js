@@ -6,6 +6,10 @@ var qentMouse = new QentianaMouse();
  * Default empty list of experiments
  */
 var experiments = new Object();
+/*
+    The current experiment
+*/
+var experiment = null;
 
 /*
     Each plot has a name, and it is identified by the id of the corresponding DIV
@@ -18,10 +22,17 @@ var plot_objects = {};
 */
 var data_objects = {};
 
-function update_plots() {
-    // console.clear();
-    for (var index in plot_names) {
-        var plot_name = plot_names[index];
+function update_plots(names) {
+    var all_names = names;
+
+    if((all_names == undefined) || (all_names.length == 0))
+    {
+        all_names = plot_names
+    }
+    console.log(all_names)
+
+    for (var index in all_names) {
+        var plot_name = all_names[index];
         plot_objects[plot_name].update_data(experiment);
     }
 
@@ -132,7 +143,7 @@ function add_event_handlers() {
 
     select_experiments_input.onchange = function () {
         experiment = experiments[this.value];
-        console.log(experiment);
+        // console.log(experiment);
         update_plots();
     }
 }
@@ -160,10 +171,9 @@ function load_experiments_from_JSON() {
     }
 }
 
-function runscript() {
+function runscript(mirror) {
     //read script
-    scriptLines = myCodeMirror.getValue();
-
+    scriptLines = mirror.getValue();
     //run script
     pyodide.runPython(scriptLines);
 }

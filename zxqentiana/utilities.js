@@ -60,7 +60,7 @@ function from_rgb(param) {
     return ret;
 }
 
-function create_description(elem_name, text) {
+function create_description(elem_name, data_obj) {
     // this.explanation = "Given a fixed number of physical qubits, what is the total success probability? The higher the probability the lighter color.";
 
     // var desc = document.createElement("div");
@@ -78,7 +78,8 @@ function create_description(elem_name, text) {
     // var container = document.getElementsByClassName(elem_name)[0];
     // container.appendChild(desc);
 
-    document.getElementById(elem_name+"desc").innerText = text;
+    document.getElementById(elem_name+"title").innerText = data_obj.title;
+    document.getElementById(elem_name+"desc").innerText = data_obj.explanation;
 }
 
 function get_container_dimension(containerID, dimName)
@@ -113,13 +114,33 @@ function create_parameter(elem_name, param_name, param_default_value) {
         elementinput.type = "checkbox";
         if (parseBool(param_default_value)) {
             elementinput.checked = true;
-
-            console.log(elementinput.checked);
         }
     } else {
         elementinput.type = "number";
         elementinput.step = "1";
         elementinput.value = param_default_value;
+    }
+
+    if(param_name == "bool_update_plot")
+    {
+        /**
+         * Half-hardcoding the events on collapse
+         */
+        //do not allow clicks, because collapses will set the param
+        elementinput.disabled = true;
+        elementinput.checked = true;
+        //
+        $('#collapse_' + elem_name).on('hidden.bs.collapse', function () {
+            elementinput.checked = false;
+        })
+        $('#collapse_' + elem_name).on('shown.bs.collapse', function () {
+            elementinput.checked = true;
+
+            /**
+             * Call the event
+             */
+            update_plots(["." + elem_name]);
+        })
     }
 }
 

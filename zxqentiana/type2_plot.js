@@ -31,12 +31,10 @@ function Type2Plot(data_obj, name, vis_options) {
             return 10 + formatPower(Math.round(Math.log(d) / Math.LN10));
         });
 
-    
-
     /**
      * HTML related
      */
-    create_description(this.plot_name.replace(".", ""), this.data_obj.explanation);
+    create_description(this.plot_name.replace(".", ""), this.data_obj);
     var ppp = this.data_obj.get_default_parameters()
     for (key in ppp) {
         create_parameter(this.plot_name.replace(".", ""), key, ppp[key]);
@@ -182,18 +180,23 @@ Type2Plot.prototype.init_visualisation = function() {
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
         .on('mouseout', qentMouse.mouseOut)
-        .on('mouseover', function(d) {
-            content = ref.data_obj.explain_data(d, experiment);
+        .on('mouseover', function() {
+            content = ref.data_obj.explain_data(data = null, experiment);
             qentMouse.mouseOver(local_console, content);
         })
         .on('mousemove', qentMouse.mouseMove);
+
+    // d3.select('#plotsvg' + ref.plot_name.replace(".", "")).selectAll('rect')
+    //     .data(data)
+    //     .enter().append('g').append('rect')
+    //     .attr('class', 'cell')
 }
 
 Type2Plot.prototype.collect_parameters = function() {
     /*
     Collect from the parameter fields in the HTML
     */
-    params = {}
+    var params = {}
     
     for (key in this.data_obj.get_default_parameters()) {
         if (!is_internal_parameter(key)) {
@@ -260,7 +263,7 @@ Type2Plot.prototype.draw_new_y_axis = function() {
 Type2Plot.prototype.update_data = function(experiment) {
     params = this.collect_parameters();
 
-    print(params);
+    // print(params);
 
     //only change if update_plot_checkbox is checked
     if (params["bool_update_plot"]) {
@@ -275,7 +278,7 @@ Type2Plot.prototype.update_data = function(experiment) {
         this.draw_new_y_axis();
 
         for (var i = out["dist_changes"].length - 1; i >= 0; i--) {
-            this.draw_vertical_line(this.y_axis[this.y_axis.length - 1], this.y_axis[0], out["dist_changes"][i]["x"])
+            this.draw_vertical_line(this.data_obj.y_axis[this.data_obj.y_axis.length - 1], this.data_obj.y_axis[0], out["dist_changes"][i]["x"])
         }
 
         var mdpos = Math.floor(this.data_obj.x_axis_values.length / 2);

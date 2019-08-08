@@ -30,7 +30,7 @@ function Type1Plot(data_obj, name, vis_options) {
         });
 
     // 
-    create_description(this.plot_name.replace(".", ""), this.data_obj.explanation);
+    create_description(this.plot_name.replace(".", ""), this.data_obj);
 
     var ppp = this.data_obj.get_default_parameters()
     for (key in ppp) {
@@ -106,14 +106,12 @@ Type1Plot.prototype.init_visualisation = function() {
 
 Type1Plot.prototype.collect_parameters = function()
 {
-    params = {}
-    
-    for (key in this.data_obj.parameters) {
+    var params = {}
+    for (key in this.data_obj.get_default_parameters()) {
         if (!is_internal_parameter(key)) {
             params[key] = read_parameter(this.plot_name.replace(".", ""), key);
         }
     }
-
     return params;
 }
 
