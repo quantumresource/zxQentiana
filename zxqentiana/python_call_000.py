@@ -8,11 +8,15 @@ import json
 import pyzx as zx
 from fractions import Fraction
 
-# The pyodide compilation makes a single file/module from the resource analysis files
+# The resource estimation engine
 from pyqentiana.cube_to_physical import Qentiana
+# The Type2 tradeoff plots
+from pyqentiana.distance_bins import DistanceBins
+# The Type1 tradeoff plots
 from pyqentiana.phys_qubits_vs_log_err import PhysicalQubitsVsLogicalError
 from pyqentiana.time_vs_space import TimeVsSpace
 from pyqentiana.res_savings import ResourceSavings
+
 
 # https://github.com/iodide-project/pyodide/blob/master/docs/type_conversions.md#using-javascript-objects-from-python
 from js import document
@@ -22,7 +26,7 @@ from js import experiment
 # See javascript_call_000.js for these declarations
 from js import plot_names
 from js import data_objects
-data_objects[".plot1"] = PhysicalQubitsVsLogicalError()
+data_objects[".plot1"] = DistanceBins()
 data_objects[".plot2"] = PhysicalQubitsVsLogicalError()
 data_objects[".plot3"] = TimeVsSpace()
 data_objects[".plot4"] = ResourceSavings()

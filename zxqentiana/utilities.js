@@ -1,66 +1,19 @@
 /*
-Utility functions
+    Utility functions
 */
 
 // use for better axis formating
 var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+
 var formatPower = function(d) {
     return (d + "").split("").map(function(c) {
         return superscript[c];
     }).join("");
 };
+
 var formatTick = function(d) {
     return 10 + (d < 0 ? "⁻" : "") + formatPower(Math.round(Math.log(d) / Math.LN10));
 };
-
-// function approx_mult_factor(factor, value) {
-//     // return Math.round(factor * value)
-//     return Math.ceil(factor * value);
-// }
-
-// function local_logspace(start, stop, num = 50) {
-//     //assume base = 10
-//     var ret = new Array(num + 1);
-
-//     var delta = (stop - start) / num;
-//     for (var i = 0; i < num + 1; i++) {
-//         ret[i] = Math.pow(10, start + delta * i);
-//     }
-
-//     return ret;
-// }
-
-// function local_linspace(start, stop, num = 50) {
-//     var ret = new Array(num);
-
-//     var delta = (stop - start) / num;
-//     for (var i = 0; i < num; i++) {
-//         ret[i] = start + delta * i;
-//     }
-
-//     return ret;
-// }
-
-// function local_linspace_2(middle, plus_minus_range, num = 50) {
-//     // assume num is odd
-//     if (num % 2 == 0) {
-//         //make odd
-//         num += 1;
-//     }
-
-//     var ret = new Array(num);
-//     var middle_index = Math.floor(num / 2);
-//     ret[middle_index] = middle;
-
-//     var float_ratio = (2 * plus_minus_range) / num;
-//     var half_distance = middle_index;
-//     for (var i = 1; i <= half_distance; i++) {
-//         ret[middle_index + i] = middle + i * float_ratio;
-//         ret[middle_index - i] = middle - i * float_ratio;
-//     }
-
-//     return ret;
-// }
 
 function create_2d_array(dim1, dim2) {
     var ret = new Array(dim1);

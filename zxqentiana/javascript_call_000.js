@@ -20,11 +20,8 @@ var data_objects = {};
 
 function update_plots() {
     // console.clear();
-    console.log("--------------------");
-
     for (var index in plot_names) {
         var plot_name = plot_names[index];
-
         plot_objects[plot_name].update_data(experiment);
     }
 
@@ -135,7 +132,7 @@ function add_event_handlers() {
 
     select_experiments_input.onchange = function () {
         experiment = experiments[this.value];
-        // console.log(experiment);
+        console.log(experiment);
         update_plots();
     }
 }

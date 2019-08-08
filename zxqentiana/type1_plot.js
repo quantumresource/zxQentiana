@@ -1,5 +1,5 @@
-function GeneralPlot(data_obj, name, vis_options) {
-    // /*
+function Type1Plot(data_obj, name, vis_options) {
+    // /* 
     //     Parameters
     // */
     this.plot_name = name;
@@ -38,7 +38,7 @@ function GeneralPlot(data_obj, name, vis_options) {
     }
 }
 
-GeneralPlot.prototype.init_visualisation = function() {
+Type1Plot.prototype.init_visualisation = function() {
     var ref = this;
 
     var data = this.data_obj.empty_data();
@@ -104,7 +104,7 @@ GeneralPlot.prototype.init_visualisation = function() {
         .on('mouseout', qentMouse.mouseOut);
 }
 
-GeneralPlot.prototype.collect_parameters = function()
+Type1Plot.prototype.collect_parameters = function()
 {
     params = {}
     
@@ -117,7 +117,7 @@ GeneralPlot.prototype.collect_parameters = function()
     return params;
 }
 
-GeneralPlot.prototype.update_data = function(experiment) {
+Type1Plot.prototype.update_data = function(experiment) {
     var ref = this;
 
     var params = this.collect_parameters();
