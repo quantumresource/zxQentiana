@@ -27,7 +27,8 @@ all: pyzx qentiana package | ${PYODIDE_BUILD}
 package: ${PYODIDE_ZX_PATH}/pyzx.% ${QENTIANA_PATH}/pyqentiana.% #interface/interface.%
 	# mkdir -p website_files
 	# The packaging is not completely solved. Comment the next two line...
-	# mkdir -p ${SITEFILES_PATH}
+	mkdir -p ${SITEFILES_PATH}
+	cp packages.json ${SITEFILES_PATH}
 	# cp pyodide_build/* ${SITEFILES_PATH}
 	#
 	# cp pyodide_zx/pyzx.data pyodide_zx/pyzx.js website_files
@@ -42,12 +43,10 @@ ${QENTIANA_PATH}/pyqentiana.%	:
 	# Copy the new Qentiana
 	cp ${QENTIANA_PATH}/pyqentiana.js ${QENTIANA_PATH}/pyqentiana.data ${SITEFILES_PATH}
 
-# interface/interface.% :
-# 	cp interface/packages.json interface/interface.js interface/interface.data ${SITEFILES_PATH}
-
 
 pyzx: ${PYODIDE_ZX_PATH}
 	$(MAKE) -I ${PWD} -C ${PYODIDE_ZX_PATH}
+
 
 ${PYODIDE_BUILD}:
 	mkdir -p ${PYODIDE_BUILD}
@@ -59,9 +58,6 @@ ${PYODIDE_BUILD}:
 qentiana:
 	$(MAKE) -I ${PWD} -C ${QENTIANA_PATH}
 
-
-# interface:
-# 	$(MAKE) -I ${PWD} -C interface
 
 serve:
 	$(PYTHON) run_website.py
