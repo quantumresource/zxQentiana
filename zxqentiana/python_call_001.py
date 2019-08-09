@@ -27,8 +27,8 @@ max_log_qubits = circuit.qubit_count()
 cons.innerHTML += "<br> T gates from pyZX " + str(t_count) + " " + str(max_log_qubits);
 
 # Construct a new experiment
-experiment["depth"] = t_count
-experiment["footprint"] = max_log_qubits
-experiment["volume"] = 1.5 * experiment.depth * experiment.footprint
+experiment["depth_units"] = t_count
+experiment["footprint"] = max_log_qubits * 1.5
+
 # Update the plots with the new experiment
 update_plots(plot_names)

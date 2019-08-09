@@ -93,7 +93,7 @@ function add_event_handlers() {
     // Update the current slider value (each time you drag the slider handle)
     depth_input.onchange = function () {
 
-        experiment.depth = this.value;
+        experiment.depth_units = this.value;
 
         //the volume is the number of qubits x time x routing factor
         experiment.volume = (experiment.routing_overhead * experiment.footprint) * experiment.depth;
