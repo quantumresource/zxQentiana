@@ -72,12 +72,12 @@ Type1Plot.prototype.init_visualisation = function() {
     svg.append("text")
         .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate(" + (-ref.options.marginpx.left / 2) + "," + (movex / 2) + ")rotate(-90)") // text is drawn off the screen top left, move down and out and rotate
-        .text("Time Factor");
+        .text("Time Scaling");
 
     svg.append("text")
         .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate(" + (movex / 2) + "," + (movey + ref.options.marginpx.top + ref.options.marginpx.bottom/2 ) + ")") // centre below axis
-        .text("Space Factor");
+        .text("Space Scaling");
     
     var local_console = document.getElementById(this.plot_name.substring(1) + "console");
 

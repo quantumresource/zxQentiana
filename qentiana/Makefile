@@ -24,6 +24,7 @@ ${STORE_FOLDER}:
 	wget ${REPOSITORY_URL}/res_savings.py -P ${STORE_FOLDER}
 	wget ${REPOSITORY_URL}/res_utils.py -P ${STORE_FOLDER}
 	wget ${REPOSITORY_URL}/time_vs_space.py -P ${STORE_FOLDER}
+	wget ${REPOSITORY_URL}/experiment.py -P ${STORE_FOLDER}
 
 clean:
 	# delete the downloaded py files

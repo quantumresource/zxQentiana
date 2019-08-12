@@ -78,7 +78,8 @@ function create_description(elem_name, data_obj) {
     // var container = document.getElementsByClassName(elem_name)[0];
     // container.appendChild(desc);
 
-    document.getElementById(elem_name+"title").innerText = data_obj.title;
+    var txt = document.getElementById(elem_name+"title").innerText
+    document.getElementById(elem_name+"title").innerText = data_obj.title + " " + txt;
     document.getElementById(elem_name+"desc").innerText = data_obj.explanation;
 }
 

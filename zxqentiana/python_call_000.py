@@ -44,7 +44,8 @@ def phase_to_s(a):
 
 def draw(g, where, scale=None):
     if not hasattr(g, 'vertices'):
-        g = g.to_graph()
+        # g = g.to_graph()
+        g = g.to_graph(compress_rows=True)
 
     if scale == None:
         scale = 800 / (g.depth() + 2)
