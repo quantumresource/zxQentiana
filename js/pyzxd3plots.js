@@ -12,7 +12,7 @@ pyZXJavaScript.prototype.nodeColor = function(t) {
 
 pyZXJavaScript.prototype.edgeColor = function(t) {
     if (t == 1) return "black";
-    else if (t == 2) return "#08f";
+    else if (t == 2) return "#0088ff";
 }
 
 pyZXJavaScript.prototype.nodeStyle = function(selected) {

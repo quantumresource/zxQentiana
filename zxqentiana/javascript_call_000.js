@@ -23,6 +23,10 @@ var plot_objects = {};
 var data_objects = {};
 
 function update_plots(names) {
+
+    // console.log("update plots is disabled from the function")
+    // return
+
     var all_names = names;
 
     if((all_names == undefined) || (all_names.length == 0))

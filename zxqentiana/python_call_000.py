@@ -17,10 +17,6 @@ from pyqentiana.phys_qubits_vs_log_err import PhysicalQubitsVsLogicalError
 from pyqentiana.time_vs_space import TimeVsSpace
 from pyqentiana.res_savings import ResourceSavings
 
-
-# https://github.com/iodide-project/pyodide/blob/master/docs/type_conversions.md#using-javascript-objects-from-python
-from js import pyZXJS
-
 # See javascript_call_000.js for these declarations
 from js import plot_names
 from js import data_objects
@@ -42,6 +38,7 @@ def phase_to_s(a):
     # unicode 0x03c0 = pi
     return ns + '\u03c0' + ds
 
+
 def draw(g, where, scale=None):
     if not hasattr(g, 'vertices'):
         # g = g.to_graph()
@@ -60,16 +57,17 @@ def draw(g, where, scale=None):
     w = "100%"
     h = "100%"
 
-    nodes = [{'name': str(v),
+    nodes = [{'id': str(v),
                 'x': (g.row(v) + 1) * scale,
                 'y': (g.qubit(v) + 2) * scale,
                 't': g.type(v),
                 'phase': phase_to_s(g.phase(v)) }
                 for v in g.vertices()]
+
     links = [{'source': str(g.edge_s(e)),
                 'target': str(g.edge_t(e)),
-                't': g.edge_type(e) } for e in g.edges()]
+                't': g.edge_type(e)}
+                 for e in g.edges()]
     
-    graphj = json.dumps({'nodes': nodes, 'links': links})
+    return {'nodes': nodes, 'links': links}
 
-    pyZXJS.showGraph("#" + where, graphj, w, h, node_size)
