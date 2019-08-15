@@ -12,11 +12,12 @@ class PhysicalQubitsVsLogicalError:
         # scaling factor space
         self.global_s = local_linspace(0.1, 2, self.nr_items)
         #
-        self.title = "Phys vs Log Error"
+        self.title = "Error vs. Exact Number of Physical Qubits"
         #
-        self.explanation = "The initial circuit is at position (1,1) and any optimization will change the " \
-                           "volume and space factor. The final position will show how much resource savings " \
-                           "can be expected. Darker colors are better."
+        self.explanation = "How many logical qubits fit on a given number of physical qubits? Fitting more " \
+                           "logical qubits increases the logical error rate for the total volume. Time is scaled on " \
+                           "the vertical axis. Logical qubits on the horizontal axis. Darker is better (lower error " \
+                           "rate). Red is inconsistent data (e.g. too few physical qubits for logical qubits)."
 
 
     def get_default_parameters(self):
@@ -52,25 +53,32 @@ class PhysicalQubitsVsLogicalError:
         for i in range(len(self.global_v)):
             for j in range(len(self.global_s)):
                 scaled_nr_log_qubits = math.ceil(nr_log_qubits * self.global_s[j])
-                scaled_volume = math.ceil(time * self.global_v[i]) * nr_log_qubits
+                scaled_time = math.ceil(time * self.global_v[i]) * nr_log_qubits
 
                 # this is the distance that fits on patch
                 dist = Qentiana.max_distance_to_fit_log_qubits_on_phys_qubits(scaled_nr_log_qubits, total_num_physical_qubits)
 
-                # the per log unit approximated failure is computed from the phys err rate and the distance
-                err_per_log_unit = Qentiana.vba_p_logical(p_err, dist)
+                err_per_exec_round = -1
+                err_per_scaled_volume = -1
 
-                # the entire volume will fail with this prob
-                err_per_scaled_volume = self.total_err(err_per_log_unit, scaled_volume)
+                if dist != -1:
+                    # the per log unit approximated failure is computed from the phys err rate and the distance
+                    err_per_exec_round = Qentiana.vba_p_logical(p_err, dist)
+
+                    execution_rounds = Qentiana.compute_number_of_rounds(elements = scaled_nr_log_qubits * scaled_time,
+                                                                         element_distance = dist,
+                                                                         element_units_in_time = 1)
+
+                    # the entire volume will fail with this prob
+                    err_per_scaled_volume = self.total_err(err_per_exec_round, execution_rounds)
 
                 # // maybe change names for this data array because different meaning of output
                 data.append({
                     "x"             : self.global_s[j],
                     "y"             : self.global_v[i],
                     "distance"      : dist,
-                    "indiv_error"   : err_per_log_unit,
+                    "indiv_error"   : err_per_exec_round,
                     "total_error"   : err_per_scaled_volume,
-                    "total_volume"  : scaled_volume,
                     "qubits_used"   : Qentiana.phys_qubits_for_all_log_qubits(scaled_nr_log_qubits, dist)
 
                 })
@@ -87,7 +95,6 @@ class PhysicalQubitsVsLogicalError:
                     "y"             : self.global_v[i],
                     "distance"      : 0,
                     "indiv_error"   : 0,
-                    "total_volume"  : 0,
                     "qubits_used"   : 0,
                     "total_error"   : 0
                 })
@@ -96,16 +103,19 @@ class PhysicalQubitsVsLogicalError:
 
 
     def color_interpretation(self, d):
+
+        if d["total_error"] == -1:
+            # this is an error - use red color
+            return "rgb(255, 0, 0)"
+
         rgb = to_rgb(d["total_error"])
         return "rgb({},{},{})".format(rgb, rgb, rgb)
 
 
     def explain_data(self, data, experiment):
-        return "Distance at point ({}, {}): {} <br>".format(data["x"], data["y"], data["distance"]) \
-            + "error rate in unit cell: {} with a total volume of {} <br>".format(data["indiv_error"], data["total_volume"]) \
-            + "Total success probability: {} <br>".format(data["total_error"])
-
-import math
+        return "Distance at point ({:.2f}, {:.2f}): {} <br>".format(data["x"], data["y"], data["distance"]) \
+            + "error rate per data round {:.4f} <br>".format(data["indiv_error"]) \
+            + "Total success probability: {:.4f} <br>".format(data["total_error"])import math
 
 
 # def analysis(data, experiment):
@@ -303,7 +313,7 @@ class ResourceSavings:
         curr_time = math.ceil(data["y"] * experiment["depth_units"])
         curr_space = math.ceil(data["x"] * experiment["footprint"])
 
-        return "{} {} -> {} <br>".format(data["x"], data["y"], data["ratio"]) \
+        return "{:.2f} {:.2f} -> {:.2f} <br>".format(data["x"], data["y"], data["ratio"]) \
                + "dist time: {} having a footprint of log qubits<br>".format(data["dist_time_scale"], curr_space) \
                + "dist space: {} for a time of {}<br>".format(data["dist_space_scale"], curr_time) \
                + "qub time: {}<br>".format(data["nr_time_scale"])\
@@ -659,7 +669,7 @@ class TimeVsSpace:
         curr_time = math.ceil(data["y"] * experiment["depth_units"])
         curr_space = math.ceil(data["x"] * experiment["footprint"])
 
-        return "{} {} -> {} <br>".format(data["x"], data["y"], data["ratio"]) \
+        return "{:.2f} {:.2f} -> {} <br>".format(data["x"], data["y"], data["ratio"]) \
                + "dist time: {} having a footprint of log qubits<br>".format(data["dist_time_scale"], curr_space) \
                + "dist space: {} for a time of {}<br>".format(data["dist_space_scale"], curr_time) \
                + "qub time: {}<br>".format(data["nr_time_scale"])\
@@ -866,28 +876,40 @@ class Qentiana:
         Compute data code distance. Consider the maximum number of units on the time axis
         :return:
         """
-        """
-        Total number of rounds of surface code error detection required to prepare the necessary number of T states.
-        T-count is T-depth when all T gates are sequential
-        Each distillation has known number of units in time
-        The distance has been computed in compute_distillation_scale_factor
-        """
-        execution_rounds = self.compute_execution_rounds()
 
-        """
-        Assume that the logical qubit patches are executed in a sequence
-        Each logical qubit is ONE unit long
-        And each unit has a distance of execution_rounds (from the distillations)
-        """
-        total_data_rounds = self.compute_number_of_rounds(elements = self.max_logical_qubits,
-                                                          element_distance = execution_rounds,
-                                                          element_units_in_time = 1)
+        prev_data_distance = -1
 
-        target_error_per_data_round = 1 / (self.parameters["safety_factor"] * total_data_rounds)
+        while prev_data_distance != self.parameters["data_code_distance"]:
 
-        # Code distance required to achieve the safe target error rate per data round.
-        self.parameters["data_code_distance"] = self.vba_distance(self.parameters["characteristic_gate_error_rate"],
-                                                                  target_error_per_data_round)
+            """
+            Save the prev data distance
+             data_code_distance is used in compute_execution_rounds, but is updated in this method.
+             In the absence of T-count, the execution rounds are a function of distance.
+            """
+            prev_data_distance = self.parameters["data_code_distance"]
+
+            """
+            Total number of rounds of surface code error detection required to prepare the necessary number of T states.
+            T-count is T-depth when all T gates are sequential
+            Each distillation has known number of units in time
+            The distance has been computed in compute_distillation_scale_factor
+            """
+            execution_rounds = self.compute_execution_rounds()
+
+            """
+            Assume that the logical qubit patches are executed in a sequence
+            Each logical qubit is ONE unit long
+            And each unit has a distance of execution_rounds (from the distillations)
+            """
+            total_data_rounds = self.compute_number_of_rounds(elements = self.max_logical_qubits,
+                                                              element_distance = execution_rounds,
+                                                              element_units_in_time = 1)
+
+            target_error_per_data_round = 1 / (self.parameters["safety_factor"] * total_data_rounds)
+
+            # Code distance required to achieve the safe target error rate per data round.
+            self.parameters["data_code_distance"] = self.vba_distance(self.parameters["characteristic_gate_error_rate"],
+                                                                      target_error_per_data_round)
 
     def compute_footprint_distillation_qubits(self):
         """
@@ -1041,7 +1063,7 @@ class Qentiana:
         ret = Qentiana.distance_from_patch_phys_qubits(max_phys_qubits_per_logical)
 
         if ret <= 2:
-            return 1
+            return -1
 
         return ret
 

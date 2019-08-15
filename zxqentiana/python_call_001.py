@@ -23,6 +23,7 @@ circuit = zx.generate.cliffordT(qubit_amount, gate_count)
 zx.simplify.full_reduce(circuit)
 
 gjson = draw(circuit, "fig_circuit")
+# print(gjson)
 # pyZXJS.showGraph("#" + where, json.dumps(gjson), w, h, node_size)
 
 # Some information from the circuit

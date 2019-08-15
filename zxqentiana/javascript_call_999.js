@@ -81,7 +81,7 @@ var my3DGraph = ForceGraph3D()
     .nodeThreeObject(d => {
         const sprite = new SpriteText(d.phase);
         sprite.color = "black";
-        sprite.textHeight = 6;
+        sprite.textHeight = 14;
         return sprite;
       })
 /*

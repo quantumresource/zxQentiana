@@ -41,25 +41,11 @@ def phase_to_s(a):
 
 def draw(g, where, scale=None):
     if not hasattr(g, 'vertices'):
-        # g = g.to_graph()
         g = g.to_graph(compress_rows=True)
 
-    if scale == None:
-        scale = 800 / (g.depth() + 2)
-        if scale > 50: scale = 50
-        if scale < 20: scale = 20
-
-    node_size = 0.2 * scale
-    if node_size < 2: node_size = 2
-
-    node_size = 5
-
-    w = "100%"
-    h = "100%"
-
     nodes = [{'id': str(v),
-                'x': (g.row(v) + 1) * scale,
-                'y': (g.qubit(v) + 2) * scale,
+                'x': g.row(v) + 1,
+                'y': g.qubit(v) + 2,
                 't': g.type(v),
                 'phase': phase_to_s(g.phase(v)) }
                 for v in g.vertices()]
