@@ -94,7 +94,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         var w;
         
         function startWorker() {
@@ -114,7 +114,7 @@
           w.terminate();
           w = undefined;
         }
-    </script>
+    </script> -->
 </head>
 
 <body>
@@ -137,13 +137,20 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Circuit
+                1. Circuits
             </div>
-            
+
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <div style="height: 250px; text-align: center;">
-                    <select id="select_circuits" name="select_circuits" size="10" style="width:200px">
+                <a class="nav-link">
+                    <span>Loads (or generates random) circuit, draws the 3D ZX diagram, extracts experiment data, update resource estimation plots</span>
+                </a>
+            </li>
+            
+            <!-- Nav Item - Charts -->
+            <li class="nav-link">
+                <div style="text-align: center;">
+                    <select id="select_circuits" name="select_circuits" size="5" style="width:200px">
                     </select>
                 </div>
             </li>
@@ -161,8 +168,14 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Experiment
+                2. Stored Experiments
             </div>
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <a class="nav-link">
+                    <span>Select an already existing experiment, update resource estimation plots</span>
+                </a>
+            </li>
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
@@ -177,35 +190,39 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Manually Configured Experiment
+                3. Manually Configured Experiment
             </div>
+            <li class="nav-item">
+                <a class="nav-link">
+                    <span>Configure the experiment, update resource estimation plots</span>
+                </a>
+            </li>
 
             <div class="inputcontainer">
-                Depth: <span id="value_depth"></span>
-                <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
+                Depth: <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
             </div>
             <div class="inputcontainer">
-                Qubits <span id="value_qubits"></span>
-                <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
+                Qubits <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
             </div>
-            <!-- <div class="inputcontainer">
-                Volume: <span id="value_volume"></span>
-                <input type="number" min="1" value="0" step="1" id="input_volume_field" class="input" readonly>
-            </div> -->
             <div class="inputcontainer">
-                per cycle error: <span id="value_error"></span>
-                <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
+                Scaling Factor [%]: <input type="number" min="1" value="50" step="1" id="input_routing_overhead" class="input">
+            </div>
+            <div class="inputcontainer">
+                Error per Cycle: <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
             </div>
             <div class="inputcontainer">
                 <input type="checkbox" id="input_force_distance" style="margin-bottom: 15px">
-                Use Fixed Distance <span id="value_distance"></span>
-                <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                scaling factor (in percent): <span id="routing_overhead"></span>
-                <input type="number" min="-99" value="50" step="1" id="input_routing_overhead" class="input">
+                Use Fixed Distance <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
             </div>
 
+             <!-- Nav Item - Charts -->
+             <li class="nav-item">
+                    <a class="nav-link" href="javascript:update_plots()">
+                        <i class="fas fa-fw fa-chart-area"></i>
+                        <span>Update plots!</span>
+                    </a>
+            </li>
+           
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 

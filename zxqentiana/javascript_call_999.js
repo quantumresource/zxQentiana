@@ -102,6 +102,8 @@ function firstrun()
 
     add_event_handlers();
 
+    update_experiment_htmls();
+
     plot_objects[".plot1"] = new Type2Plot(data_objects[".plot1"],".plot1", vis_options);
     plot_objects[".plot2"] = new Type1Plot(data_objects[".plot2"],".plot2", vis_options);
     plot_objects[".plot3"] = new Type1Plot(data_objects[".plot3"], ".plot3", vis_options);

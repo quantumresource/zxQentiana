@@ -1,6 +1,6 @@
 {
     "_comment": "TODO: Repair bug when determining error rate from forced distance. Below we are forcing much lower distances such that the one we compute is the commented one. APPROXIMATION ERRORS",
-    "pyZX": {
+    "manual": {
         "footprint" : 10,
         "depth_units": 50,
         "physical_error_rate": 0.001,

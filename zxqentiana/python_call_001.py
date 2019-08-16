@@ -16,9 +16,6 @@ figcircuit = document.getElementById("fig_circuit")
 #
 # PyZX part
 #
-qubit_amount = 10
-gate_count = 80
-
 circuit = None
 if circuit_url_from_js != "random":
     load_and_save_file(circuit_url_from_js, fname_circuit_url_from_js)
@@ -26,6 +23,8 @@ if circuit_url_from_js != "random":
     circuit = zx.Circuit.load(fname_circuit_url_from_js).to_graph()
 else:
     #Generate random circuit of Clifford gates
+    qubit_amount = 10
+    gate_count = 80
     circuit = zx.generate.cliffordT(qubit_amount, gate_count)
 
 #Use one of the built-in rewriting strategies to simplify the circuit
@@ -44,9 +43,11 @@ t_count = zx.tcount(circuit)
 max_log_qubits = circuit.qubit_count()
 cons.innerHTML += "<br> {} T gates, and {} qubits from pyZX ".format(t_count, max_log_qubits);
 
-# Construct a new experiment
+# Construct a new experiment - will update the manual configuration
 experiment["depth_units"] = t_count
-experiment["footprint"] = max_log_qubits * 1.5
+experiment["routing_overhead"] = 50
+experiment["footprint"] = max_log_qubits * (100 + experiment["routing_overhead"])/100
+
 
 # Update the plots with the new experiment
 update_plots(plot_names)
