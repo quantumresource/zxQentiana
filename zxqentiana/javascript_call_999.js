@@ -98,6 +98,7 @@ function firstrun()
     */
 
     load_experiments_from_JSON();
+    load_circuits_from_JSON();
 
     add_event_handlers();
 

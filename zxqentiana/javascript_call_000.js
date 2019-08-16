@@ -12,6 +12,12 @@ var experiments = new Object();
 var experiment = null;
 
 /*
+    For loading circuit files and not random circuits
+*/
+var circuit_url_from_js = null;
+var fname_circuit_url_from_js = null;
+
+/*
     Each plot has a name, and it is identified by the id of the corresponding DIV
 */
 var plot_names = [".plot1", ".plot2", ".plot3", ".plot4"];
@@ -47,26 +53,21 @@ function update_plots(names) {
 
 function update_labels() {
     var depth_input = document.getElementById("input_depth_field");
-    var volume_input = document.getElementById("input_volume_field");
     var logical_qubits_input = document.getElementById("input_qubit_field");
     var phys_err_rate_input = document.getElementById("input_err_field");
     var force_distance_input = document.getElementById("input_force_distance");
     var distance_input = document.getElementById("input_distance_field");
     var routing_overhead_input = document.getElementById("input_routing_overhead");
 
-    depth_input.value = experiment.depth;
-    volume_input.value = experiment.volume;
-    logical_qubits_input.value = experiment.footprint;
-    phys_err_rate_input.value = experiment.physical_error_rate;
-    force_distance_input.checked = experiment.bool_distance;
-    distance_input.value = experiment.enforced_distance;
-    routing_overhead_input.value = experiment.routing_overhead;
+    depth_input.value = experiment["depth_units"];
+    logical_qubits_input.value = experiment["footprint"];
+    phys_err_rate_input.value = experiment["physical_error_rate"];
+    force_distance_input.checked = experiment["bool_distance"];
+    distance_input.value = experiment["enforced_distance"];
+    routing_overhead_input.value = experiment["routing_overhead"];
 
     var output0 = document.getElementById("value_depth");
     output0.innerHTML = depth_input.value;
-
-    var output1 = document.getElementById("value_volume");
-    output1.innerHTML = volume_input.value;
 
     var output2 = document.getElementById("value_qubits");
     output2.innerHTML = logical_qubits_input.value;
@@ -83,7 +84,6 @@ function update_labels() {
 
 function add_event_handlers() {
     var depth_input = document.getElementById("input_depth_field");
-    // var volume_input = document.getElementById("input_volume_field");
     var logical_qubits_input = document.getElementById("input_qubit_field");
     var phys_err_rate_input = document.getElementById("input_err_field");
     var force_distance_input = document.getElementById("input_force_distance");
@@ -92,56 +92,47 @@ function add_event_handlers() {
 
     var select_experiments_input = document.getElementById("select_experiments");
 
+    var select_circuits_input = document.getElementById("select_circuits");
+
     update_labels();
 
     // Update the current slider value (each time you drag the slider handle)
     depth_input.onchange = function () {
+        experiment["depth_units"] = this.value;
 
-        experiment.depth_units = this.value;
-
-        //the volume is the number of qubits x time x routing factor
-        experiment.volume = (experiment.routing_overhead * experiment.footprint) * experiment.depth;
         update_plots();
     }
 
     // Update the current slider value (each time you drag the slider handle)
-    // volume_input.onchange = function() {
-    //     volume_min = this.value;
-    //     update_plots();
-    // }
-
-    // Update the current slider value (each time you drag the slider handle)
     logical_qubits_input.onchange = function () {
-        experiment.footprint = this.value;
-
-        experiment.volume = (experiment.routing_overhead * experiment.footprint) * experiment.depth;
+        experiment["footprint"] = this.value;
 
         update_plots();
     }
 
     // Update the current slider value (each time you drag the slider handle)
     phys_err_rate_input.onchange = function () {
-        experiment.physical_error_rate = this.value;
+        experiment["physical_error_rate"] = this.value;
         // console.log(experiment.physical_error_rate)
         update_plots();
     }
 
     // Update the current slider value (each time you drag the slider handle)
     force_distance_input.onchange = function () {
-        experiment.bool_distance = this.checked;
+        experiment["bool_distance"] = this.checked;
         update_plots();
     }
 
     // Update the current slider value (each time you drag the slider handle)
     distance_input.onchange = function () {
-        experiment.enforced_distance = this.value;
-        if (experiment.bool_distance) {
+        experiment["enforced_distance"] = this.value;
+        if (experiment["bool_distance"]) {
             update_plots();
         }
     }
 
     routing_overhead_input.onchange = function () {
-        experiment.routing_overhead = this.value;
+        experiment["routing_overhead"] = this.value;
         update_plots();
     }
 
@@ -149,6 +140,13 @@ function add_event_handlers() {
         experiment = experiments[this.value];
         // console.log(experiment);
         update_plots();
+    }
+
+    select_circuits_input.onchange = function(){
+        fname_circuit_url_from_js = select_circuits_input.options[select_circuits_input.selectedIndex].text; 
+        circuit_url_from_js = select_circuits_input.value;
+        
+        runscript(myCodeMirror001);
     }
 }
 
@@ -158,8 +156,6 @@ function load_experiments_from_JSON() {
     xmlhttp.send();
 
     experiments = JSON.parse(xmlhttp.responseText);
-    //default experiment when loaded
-    experiment = experiments["pyZX"];
 
     select = document.getElementById('select_experiments');
     for (var name in experiments) {
@@ -173,6 +169,30 @@ function load_experiments_from_JSON() {
         opt.innerHTML = name;
         select.appendChild(opt);
     }
+
+    //default experiment when loaded
+    experiment = experiments["pyZX"];
+}
+
+function load_circuits_from_JSON() {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open('GET', 'zxqentiana/zx_circuits.json', false);
+    xmlhttp.send();
+
+    circuits = JSON.parse(xmlhttp.responseText);
+
+    select = document.getElementById('select_circuits');
+    for (var name in circuits) {
+        var opt = document.createElement('option');
+
+        opt.value = circuits[name];
+        opt.innerHTML = name;
+        select.appendChild(opt);
+    }
+
+    // The default values
+    circuit_url_from_js = "random";
+    fname_circuit_url_from_js = "random";
 }
 
 function runscript(mirror) {
@@ -180,4 +200,13 @@ function runscript(mirror) {
     scriptLines = mirror.getValue();
     //run script
     pyodide.runPython(scriptLines);
+}
+
+function load_remote_file(url)
+{
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open('GET', url, false);
+    xmlhttp.send();
+
+    return xmlhttp.responseText;
 }

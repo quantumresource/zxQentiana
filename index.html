@@ -87,9 +87,33 @@
                 firstrun();
 
                 // Run the code in second Python
+                // postMessage("Python script started");
                 runscript(myCodeMirror001);
+                // postMessage("Python script finished");
             });
         });
+    </script>
+
+    <script>
+        var w;
+        
+        function startWorker() {
+          if (typeof(Worker) !== "undefined") {
+            if (typeof(w) == "undefined") {
+              w = new Worker("demo_workers.js");
+            }
+            w.onmessage = function(event) {
+              document.getElementById("result").innerHTML = event.data;
+            };
+          } else {
+            document.getElementById("result").innerHTML = "Sorry! No Web Worker support.";
+          }
+        }
+        
+        function stopWorker() {
+          w.terminate();
+          w = undefined;
+        }
     </script>
 </head>
 
@@ -113,40 +137,22 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Manually Configured Circuit
+                Circuit
             </div>
-
-            <div class="inputcontainer">
-                Depth: <span id="value_depth"></span>
-                <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                Qubits <span id="value_qubits"></span>
-                <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                Volume: <span id="value_volume"></span>
-                <input type="number" min="1" value="0" step="1" id="input_volume_field" class="input" readonly>
-            </div>
-            <div class="inputcontainer">
-                per cycle error: <span id="value_error"></span>
-                <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                <input type="checkbox" id="input_force_distance" style="margin-bottom: 15px">
-                Use Fixed Distance <span id="value_distance"></span>
-                <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
-            </div>
-            <div class="inputcontainer">
-                scaling factor (in percent): <span id="routing_overhead"></span>
-                <input type="number" min="-99" value="50" step="1" id="input_routing_overhead" class="input">
-            </div>
+            
+            <!-- Nav Item - Charts -->
+            <li class="nav-item">
+                <div style="height: 250px; text-align: center;">
+                    <select id="select_circuits" name="select_circuits" size="10" style="width:200px">
+                    </select>
+                </div>
+            </li>
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
                 <a class="nav-link" href="javascript:runscript(myCodeMirror001)">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Generate a random circuit with the above parameters</span>
+                    <span>Run script: Play with ZX</span>
                 </a>
             </li>
 
@@ -165,6 +171,40 @@
                     </select>
                 </div>
             </li>
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Manually Configured Experiment
+            </div>
+
+            <div class="inputcontainer">
+                Depth: <span id="value_depth"></span>
+                <input type="number" min="1" value="50" step="1" id="input_depth_field" class="input">
+            </div>
+            <div class="inputcontainer">
+                Qubits <span id="value_qubits"></span>
+                <input type="number" min="1" value="10" step="1" id="input_qubit_field" class="input">
+            </div>
+            <!-- <div class="inputcontainer">
+                Volume: <span id="value_volume"></span>
+                <input type="number" min="1" value="0" step="1" id="input_volume_field" class="input" readonly>
+            </div> -->
+            <div class="inputcontainer">
+                per cycle error: <span id="value_error"></span>
+                <input type="number" min="0" value="0.0000" step="0.0002" id="input_err_field" class="input">
+            </div>
+            <div class="inputcontainer">
+                <input type="checkbox" id="input_force_distance" style="margin-bottom: 15px">
+                Use Fixed Distance <span id="value_distance"></span>
+                <input type="number" min="5" value="0" step="1" id="input_distance_field" class="input">
+            </div>
+            <div class="inputcontainer">
+                scaling factor (in percent): <span id="routing_overhead"></span>
+                <input type="number" min="-99" value="50" step="1" id="input_routing_overhead" class="input">
+            </div>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
@@ -178,11 +218,6 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Already Existing Circuits
-            </div>
 
             <!-- Sidebar Toggler (Sidebar) -->
             <!-- <div class="text-center d-none d-md-inline">
@@ -351,7 +386,7 @@
                                 <div class="collapse show" id="collapseOutput">
                                     <div class="card-body">
                                         <div>
-                                            Click and drag the nodes.
+                                            Click and drag the nodes. Diagrams with too many nodes and edges are not drawn, in order to not kill the browser.
                                         </div>
                                         <div id="fig_circuit"
                                             style="height:30vw; background:rgb(203, 219, 182); margin:10px">

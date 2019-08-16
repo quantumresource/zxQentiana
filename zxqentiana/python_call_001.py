@@ -4,7 +4,10 @@ from js import update_plots
 from js import plot_names
 
 from js import my3DGraph
-from js import pyZXJS
+# from js import pyZXJS
+from js import load_remote_file
+from js import circuit_url_from_js
+from js import fname_circuit_url_from_js
 
 # get DOM elements
 cons = document.getElementById("txt_console")
@@ -16,15 +19,25 @@ figcircuit = document.getElementById("fig_circuit")
 qubit_amount = 10
 gate_count = 80
 
-#Generate random circuit of Clifford gates
-circuit = zx.generate.cliffordT(qubit_amount, gate_count)
+circuit = None
+if circuit_url_from_js != "random":
+    load_and_save_file(circuit_url_from_js, fname_circuit_url_from_js)
+    #open and read the file after the appending:
+    circuit = zx.Circuit.load(fname_circuit_url_from_js).to_graph()
+else:
+    #Generate random circuit of Clifford gates
+    circuit = zx.generate.cliffordT(qubit_amount, gate_count)
 
 #Use one of the built-in rewriting strategies to simplify the circuit
 zx.simplify.full_reduce(circuit)
 
-gjson = draw(circuit, "fig_circuit")
-# print(gjson)
-# pyZXJS.showGraph("#" + where, json.dumps(gjson), w, h, node_size)
+# Draw the circuit only if the ZX diagram is small enough not to kill the browser
+if (len(list(circuit.edges())) < 1000) and (len(list(circuit.vertices())) < 200):
+    gjson = draw(circuit, "fig_circuit")
+else:
+    gjson = {'nodes':[], 'links': []}
+
+my3DGraph.graphData(gjson)
 
 # Some information from the circuit
 t_count = zx.tcount(circuit)
@@ -37,5 +50,3 @@ experiment["footprint"] = max_log_qubits * 1.5
 
 # Update the plots with the new experiment
 update_plots(plot_names)
-
-my3DGraph.graphData(gjson)

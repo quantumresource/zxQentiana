@@ -25,6 +25,8 @@ data_objects[".plot2"] = PhysicalQubitsVsLogicalError()
 data_objects[".plot3"] = TimeVsSpace()
 data_objects[".plot4"] = ResourceSavings()
 
+from js import load_remote_file
+
 #
 ## Functions
 #
@@ -56,4 +58,18 @@ def draw(g, where, scale=None):
                  for e in g.edges()]
     
     return {'nodes': nodes, 'links': links}
+
+
+def load_and_save_file(url, fname):
+    # check if file exists
+    import os
+    if os.path.isfile(fname) :
+        return
+
+    # load circuit from url
+    f = open(fname, "a")
+    # call the JS method that uses xmlhttprequest
+    f.write(load_remote_file(url))
+    f.close()
+
 

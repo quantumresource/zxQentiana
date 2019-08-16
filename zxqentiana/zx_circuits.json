@@ -1,0 +1,6 @@
+{
+    "random": "random",
+    "adder_8_after_heavy": "https://raw.githubusercontent.com/Quantomatic/pyzx/master/circuits/Arithmetic_and_Toffoli/adder_8_after_heavy",
+    "barenco_tof_10_tpar.qc" : "https://raw.githubusercontent.com/Quantomatic/pyzx/master/circuits/Arithmetic_and_Toffoli/barenco_tof_10_tpar.qc",
+    "gf^32_mult_tpar.qc" : "https://raw.githubusercontent.com/Quantomatic/pyzx/master/circuits/Arithmetic_and_Toffoli/gf2%5E32_mult_tpar.qc"
+}
