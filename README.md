@@ -11,6 +11,8 @@ Browser based tool for resource estimating quantum circuits (processed by pyZX).
 
 <a href="https://docs.google.com/presentation/d/e/2PACX-1vQ3ikcnnLrruod0jHAHC5e-jBfwnwE07iwuUVT642E44odPCaa626p1jrFPPDV1ZJhOSM4y2R3dZjfR/pub?start=true&loop=false&delayms=5000&slide=id.g5b51ccc5bf_1_14" target="_blank">See a presentation of zxQentiana here</a>
 
+<a href="https://alpha.iodide.io/notebooks/2847/" target="_blank">Have a look at an example of zxQentiana in Iodide</a>
+
 Each individual project can be found on their respective github repositories:
 
 - PyZX: [Github](https://github.com/Quantomatic/pyzx) [Demo](http://zxcalculus.com/pyzx.html)
