@@ -104,7 +104,7 @@ function create_divs_for_plot(parent, el_name, default_width, default_height)
         return;
     }
 
-    sizes = "width:" + default_width + "; height:" + default_height;
+    sizes = "border: 1px solid green; width:" + default_width + "; height:" + default_height;
     var divplot = document.createElement("div");
     divplot.setAttribute("class", elem_name);
     divplot.setAttribute("style", sizes);
