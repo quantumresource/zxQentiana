@@ -122,7 +122,10 @@ Type2Plot.prototype.draw_line_plot = function(data) {
     // d3.select("#plotsvg" + ref.plot_name.replace(".", "")).append("svg:path").attr("class","line_plot").attr("d", line1(data));
 }
 
-Type2Plot.prototype.init_visualisation = function() {
+Type2Plot.prototype.init_visualisation = function(parent_holder) {
+
+    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
+
     var ref = this;
 
     var svg = d3.select(this.plot_name)

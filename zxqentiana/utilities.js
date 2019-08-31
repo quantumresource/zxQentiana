@@ -88,6 +88,35 @@ function get_container_dimension(containerID, dimName)
     return document.getElementsByClassName(containerID)[0].parentElement[dimName];
 }
 
+function create_divs_for_plot(parent, elem_name, default_width, default_height)
+{
+    /*
+        If the plot div name does not exist, then create the entire sequence of divs
+        This is useful in iodide, for example.
+        In index.html the divs are manually added, so this method is not executed
+    */
+
+    if(document.getElementsByClassName(elem_name.replace(".", "")).length > 0)
+    {
+        //if the main div exists, nothing to do
+        return;
+    }
+
+    sizes = "width:" + default_width + "; height:" + default_height;
+    var divplot = document.createElement("div", {class: elem_name, style: sizes});
+
+    var divtitle = document.createElement("div", {id: elem_name + "title"});
+    var divdesc = document.createElement("div", {id: elem_name + "desc"});
+    var divparams = document.createElement("div", {id: elem_name + "params"});
+    var divconsole = document.createElement("div", {id: elem_name + "console"});
+
+    parent.appendChild(divplot);
+    parent.appendChild(divtitle);
+    parent.appendChild(divdesc);
+    parent.appendChild(divparams);
+    parent.appendChild(divconsole);
+}
+
 function create_parameter(elem_name, param_name, param_default_value) {
     if (param_name.startsWith("___")) {
         //this should not be displayed

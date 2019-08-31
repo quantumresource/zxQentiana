@@ -38,7 +38,10 @@ function Type1Plot(data_obj, name, vis_options) {
     }
 }
 
-Type1Plot.prototype.init_visualisation = function() {
+Type1Plot.prototype.init_visualisation = function(parent_holder) {
+
+    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
+
     var ref = this;
 
     var data = this.data_obj.empty_data();
