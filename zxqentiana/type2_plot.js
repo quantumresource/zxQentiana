@@ -1,4 +1,4 @@
-function Type2Plot(data_obj, name, vis_options) {
+function Type2Plot(parent_holder, data_obj, name, vis_options) {
     // /* 
     //     Parameters
     // */
@@ -7,6 +7,8 @@ function Type2Plot(data_obj, name, vis_options) {
     this.options = Object.create(vis_options);
     // 
     this.data_obj = data_obj;
+    //
+    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
     //
     update_vis_dimensions(this.options, this.plot_name, this.data_obj.nr_items);
     //
@@ -122,9 +124,7 @@ Type2Plot.prototype.draw_line_plot = function(data) {
     // d3.select("#plotsvg" + ref.plot_name.replace(".", "")).append("svg:path").attr("class","line_plot").attr("d", line1(data));
 }
 
-Type2Plot.prototype.init_visualisation = function(parent_holder) {
-
-    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
+Type2Plot.prototype.init_visualisation = function() {
 
     var ref = this;
 

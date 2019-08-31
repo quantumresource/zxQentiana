@@ -1,4 +1,4 @@
-function Type1Plot(data_obj, name, vis_options) {
+function Type1Plot(parent_holder, data_obj, name, vis_options) {
     // /* 
     //     Parameters
     // */
@@ -7,6 +7,8 @@ function Type1Plot(data_obj, name, vis_options) {
     this.options = Object.create(vis_options);
     // 
     this.data_obj = data_obj;
+    //
+    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
     //
     update_vis_dimensions(this.options, this.plot_name, this.data_obj.nr_items);
     //
@@ -38,10 +40,7 @@ function Type1Plot(data_obj, name, vis_options) {
     }
 }
 
-Type1Plot.prototype.init_visualisation = function(parent_holder) {
-
-    create_divs_for_plot(parent_holder, this.plot_name, "400px", "400px");
-
+Type1Plot.prototype.init_visualisation = function() {
     var ref = this;
 
     var data = this.data_obj.empty_data();

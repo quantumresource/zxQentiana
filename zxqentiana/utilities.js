@@ -88,7 +88,7 @@ function get_container_dimension(containerID, dimName)
     return document.getElementsByClassName(containerID)[0].parentElement[dimName];
 }
 
-function create_divs_for_plot(parent, elem_name, default_width, default_height)
+function create_divs_for_plot(parent, el_name, default_width, default_height)
 {
     /*
         If the plot div name does not exist, then create the entire sequence of divs
@@ -96,19 +96,30 @@ function create_divs_for_plot(parent, elem_name, default_width, default_height)
         In index.html the divs are manually added, so this method is not executed
     */
 
-    if(document.getElementsByClassName(elem_name.replace(".", "")).length > 0)
+    elem_name = el_name.replace(".", "");
+
+    if(parent == null || parent.getElementsByClassName(elem_name).length > 0)
     {
         //if the main div exists, nothing to do
         return;
     }
 
-    sizes = "width:" + default_width + "; height:" + default_height;
-    var divplot = document.createElement("div", {class: elem_name, style: sizes});
+    sizes = "background-color:red; width:" + default_width + "; height:" + default_height;
+    var divplot = document.createElement("div");
+    divplot.setAttribute("class", elem_name);
+    divplot.setAttribute("style", sizes);
+    
+    var divtitle = document.createElement("div");
+    divtitle.setAttribute("id", elem_name + "title");
 
-    var divtitle = document.createElement("div", {id: elem_name + "title"});
-    var divdesc = document.createElement("div", {id: elem_name + "desc"});
-    var divparams = document.createElement("div", {id: elem_name + "params"});
-    var divconsole = document.createElement("div", {id: elem_name + "console"});
+    var divdesc = document.createElement("div");
+    divdesc.setAttribute("id", elem_name + "desc");
+
+    var divparams = document.createElement("div");
+    divparams.setAttribute("id", elem_name + "params");
+
+    var divconsole = document.createElement("div");
+    divconsole.setAttribute("id", elem_name + "console");
 
     parent.appendChild(divplot);
     parent.appendChild(divtitle);
