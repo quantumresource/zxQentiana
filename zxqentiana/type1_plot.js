@@ -98,10 +98,8 @@ Type1Plot.prototype.init_visualisation = function() {
         })
         .on('mouseover', function(d) {
             content = ref.data_obj.explain_data(d, experiment);
-            qentMouse.mouseOver(local_console, content);
-        })
-        .on('mousemove', qentMouse.mouseMove)
-        .on('mouseout', qentMouse.mouseOut);
+            local_console.innerHTML = content;
+        });
 }
 
 Type1Plot.prototype.collect_parameters = function()

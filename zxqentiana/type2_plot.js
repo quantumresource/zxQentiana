@@ -179,12 +179,10 @@ Type2Plot.prototype.init_visualisation = function() {
         .attr('height', ref.options.height + "%")
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
-        .on('mouseout', qentMouse.mouseOut)
         .on('mouseover', function() {
             content = ref.data_obj.explain_data(data = null, experiment);
-            qentMouse.mouseOver(local_console, content);
-        })
-        .on('mousemove', qentMouse.mouseMove);
+            local_console.innerHTML = content;
+        });
 
     // d3.select('#plotsvg' + ref.plot_name.replace(".", "")).selectAll('rect')
     //     .data(data)

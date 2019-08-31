@@ -1,5 +1,3 @@
-qentMouse.findToolTip();
-
 var myCodeMirror000 = CodeMirror.fromTextArea(document.getElementById("txt_script_1"), {
     mode: {name: "python",
             version: 3,

@@ -1,7 +1,4 @@
 var pyZXJS = new pyZXJavaScript();
-/*
-*/
-var qentMouse = new QentianaMouse();
 /**
  * Default empty list of experiments
  */
