@@ -61,27 +61,47 @@
 
     <script src="zxqentiana/javascript_call_000.js"></script>
 
-    <!-- <script>
-        var w;
-        
-        function startWorker() {
-          if (typeof(Worker) !== "undefined") {
-            if (typeof(w) == "undefined") {
-              w = new Worker("demo_workers.js");
-            }
-            w.onmessage = function(event) {
-              document.getElementById("result").innerHTML = event.data;
-            };
-          } else {
-            document.getElementById("result").innerHTML = "Sorry! No Web Worker support.";
-          }
-        }
-        
-        function stopWorker() {
-          w.terminate();
-          w = undefined;
-        }
-    </script> -->
+    <script>
+        /*
+            Execute the first Python
+        */
+        //Load the Pyodide environment
+        languagePluginLoader.then(function () {
+            pyodide.loadPackage(['pyqentiana', 'pyzx']).then(function(){
+                return makeRequest("zxqentiana/stored_experiments.json");
+            }).then(function(xhr) {
+                load_experiments_from_JSON(xhr.responseText);
+                return makeRequest("zxqentiana/zx_circuits.json");
+            }).then(function(xhr){
+                load_circuits_from_JSON(xhr.responseText);
+            }).then(function () {
+                return makeRequest("zxqentiana/python_call_000.py?" + new Date().getTime() );
+            }).then(function(xhr){
+                myCodeMirror000.setValue(xhr.responseText);
+                return makeRequest("zxqentiana/python_call_001.py?" + new Date().getTime() );
+            }).then(function(xhr){
+                myCodeMirror001.setValue(xhr.responseText);
+                /*Execute the first Python*/
+                return pyodide.runPythonAsync(myCodeMirror000.getValue());
+            }).then(function(){
+                plot_objects[".plot1"] = new Type2Plot(document, data_objects[".plot1"],".plot1", vis_options);
+                plot_objects[".plot2"] = new Type1Plot(document, data_objects[".plot2"],".plot2", vis_options);
+                plot_objects[".plot3"] = new Type1Plot(document, data_objects[".plot3"], ".plot3", vis_options);
+                plot_objects[".plot4"] = new Type1Plot(document, data_objects[".plot4"], ".plot4", vis_options);
+
+                for (var index in plot_names) {
+                    var pl_name = plot_names[index];
+                    plot_objects[pl_name].init_visualisation();
+                }
+            }).then(function(){
+                // Run the code in second Python
+                // postMessage("Python script started");
+                pyodide.runPython(myCodeMirror001.getValue());
+                // postMessage("Python script finished");
+                add_event_handlers();
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -420,48 +440,6 @@
     </div>
 
     <!-- <div id="tooltip" style="visibility: hidden; z-index: 2000;"> -->
-
-    <script>
-        /*
-            Execute the first Python
-        */
-        //Load the Pyodide environment
-        languagePluginLoader.then(function () {
-            makeRequest("zxqentiana/stored_experiments.json").then(function(xhr)
-            {
-                load_experiments_from_JSON(xhr.responseText);
-                return makeRequest("zxqentiana/zx_circuits.json");
-            }).then(function(xhr){
-                load_circuits_from_JSON(xhr.responseText);
-                add_event_handlers();
-                return pyodide.loadPackage(['pyzx', 'pyqentiana']);
-            }).then(function () {
-                return makeRequest("zxqentiana/python_call_000.py");
-            }).then(function(xhr){
-                myCodeMirror000.setValue(xhr.responseText);
-                return makeRequest("zxqentiana/python_call_001.py");
-            }).then(function(xhr){
-                myCodeMirror001.setValue(xhr.responseText);
-                /*Execute the first Python*/
-                return pyodide.runPythonAsync(myCodeMirror000.getValue());
-            }).then(function(){
-                plot_objects[".plot1"] = new Type2Plot(document, data_objects[".plot1"],".plot1", vis_options);
-                plot_objects[".plot2"] = new Type1Plot(document, data_objects[".plot2"],".plot2", vis_options);
-                plot_objects[".plot3"] = new Type1Plot(document, data_objects[".plot3"], ".plot3", vis_options);
-                plot_objects[".plot4"] = new Type1Plot(document, data_objects[".plot4"], ".plot4", vis_options);
-
-                for (var index in plot_names) {
-                    var pl_name = plot_names[index];
-                    plot_objects[pl_name].init_visualisation();
-                }
-            }).then(function(){
-                // Run the code in second Python
-                // postMessage("Python script started");
-                pyodide.runPython(myCodeMirror001.getValue());
-                // postMessage("Python script finished");
-            });
-        });
-    </script>
 
     <script src="zxqentiana/javascript_call_999.js"></script>
 </body>
