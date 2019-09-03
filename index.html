@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="shortcut icon" href="#">
 
     <!-- Custom fonts for this template-->
     <link href="js/libs/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -59,40 +60,6 @@
     <!-- <script src="js/libs/sb-admin2/sb-admin-2.min.js"></script> -->
 
     <script src="zxqentiana/javascript_call_000.js"></script>
-
-    <script>
-        //Load the Pyodide environment
-        languagePluginLoader.then(function () {
-            pyodide.loadPackage(['pyzx', 'pyqentiana']).then(function () {
-                // show interface only now
-                // document.getElementsByTagName("body")[0].style.display = "block";
-
-                //load the script in the texteditor
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open('GET', 'zxqentiana/python_call_000.py', false);
-                xmlhttp.send();
-                //load codemirror python script
-                myCodeMirror000.setValue(xmlhttp.responseText);
-
-                //load the script in the texteditor
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open('GET', 'zxqentiana/python_call_001.py', false);
-                xmlhttp.send();
-                //load codemirror python script
-                myCodeMirror001.setValue(xmlhttp.responseText);
-
-                /*Execute the first Python*/
-                runscript(myCodeMirror000);
-
-                firstrun();
-
-                // Run the code in second Python
-                // postMessage("Python script started");
-                runscript(myCodeMirror001);
-                // postMessage("Python script finished");
-            });
-        });
-    </script>
 
     <!-- <script>
         var w;
@@ -157,7 +124,7 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="javascript:runscript(myCodeMirror001)">
+                <a class="nav-link" href="javascript:pyodide.runPython(myCodeMirror001.getValue());">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Run script: Play with ZX</span>
                 </a>
@@ -453,6 +420,48 @@
     </div>
 
     <!-- <div id="tooltip" style="visibility: hidden; z-index: 2000;"> -->
+
+    <script>
+        /*
+            Execute the first Python
+        */
+        //Load the Pyodide environment
+        languagePluginLoader.then(function () {
+            makeRequest("zxqentiana/stored_experiments.json").then(function(xhr)
+            {
+                load_experiments_from_JSON(xhr.responseText);
+                return makeRequest("zxqentiana/zx_circuits.json");
+            }).then(function(xhr){
+                load_circuits_from_JSON(xhr.responseText);
+                add_event_handlers();
+                return pyodide.loadPackage(['pyzx', 'pyqentiana']);
+            }).then(function () {
+                return makeRequest("zxqentiana/python_call_000.py");
+            }).then(function(xhr){
+                myCodeMirror000.setValue(xhr.responseText);
+                return makeRequest("zxqentiana/python_call_001.py");
+            }).then(function(xhr){
+                myCodeMirror001.setValue(xhr.responseText);
+                /*Execute the first Python*/
+                return pyodide.runPythonAsync(myCodeMirror000.getValue());
+            }).then(function(){
+                plot_objects[".plot1"] = new Type2Plot(document, data_objects[".plot1"],".plot1", vis_options);
+                plot_objects[".plot2"] = new Type1Plot(document, data_objects[".plot2"],".plot2", vis_options);
+                plot_objects[".plot3"] = new Type1Plot(document, data_objects[".plot3"], ".plot3", vis_options);
+                plot_objects[".plot4"] = new Type1Plot(document, data_objects[".plot4"], ".plot4", vis_options);
+
+                for (var index in plot_names) {
+                    var pl_name = plot_names[index];
+                    plot_objects[pl_name].init_visualisation();
+                }
+            }).then(function(){
+                // Run the code in second Python
+                // postMessage("Python script started");
+                pyodide.runPython(myCodeMirror001.getValue());
+                // postMessage("Python script finished");
+            });
+        });
+    </script>
 
     <script src="zxqentiana/javascript_call_999.js"></script>
 </body>

@@ -53,12 +53,19 @@ function update_experiment_htmls() {
     var distance_input = document.getElementById("input_distance_field");
     var routing_overhead_input = document.getElementById("input_routing_overhead");
 
-    depth_input.value = experiment["depth_units"];
-    logical_qubits_input.value = experiment["footprint"];
-    phys_err_rate_input.value = experiment["physical_error_rate"];
-    force_distance_input.checked = experiment["bool_distance"];
-    distance_input.value = experiment["enforced_distance"];
-    routing_overhead_input.value = experiment["routing_overhead"];
+    if(experiment != null)
+    {
+        depth_input.value = experiment["depth_units"];
+        logical_qubits_input.value = experiment["footprint"];
+        phys_err_rate_input.value = experiment["physical_error_rate"];
+        force_distance_input.checked = experiment["bool_distance"];
+        distance_input.value = experiment["enforced_distance"];
+        routing_overhead_input.value = experiment["routing_overhead"];
+    }
+    else
+    {
+        console.log("-- null experiment. The JSON has not finished loading?");
+    }
 }
 
 function add_event_handlers() {
@@ -120,16 +127,12 @@ function add_event_handlers() {
         fname_circuit_url_from_js = select_circuits_input.options[select_circuits_input.selectedIndex].text; 
         circuit_url_from_js = select_circuits_input.value;
         
-        runscript(myCodeMirror001);
+        pyodide.runPython(myCodeMirror001.getValue());
     }
 }
 
-function load_experiments_from_JSON() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('GET', 'zxqentiana/stored_experiments.json', false);
-    xmlhttp.send();
-
-    experiments = JSON.parse(xmlhttp.responseText);
+function load_experiments_from_JSON(responseText) {
+    experiments = JSON.parse(responseText);
 
     select = document.getElementById('select_experiments');
     for (var name in experiments) {
@@ -146,14 +149,12 @@ function load_experiments_from_JSON() {
 
     //default experiment when loaded
     experiment = experiments["manual"];
+
+    update_experiment_htmls();
 }
 
-function load_circuits_from_JSON() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('GET', 'zxqentiana/zx_circuits.json', false);
-    xmlhttp.send();
-
-    circuits = JSON.parse(xmlhttp.responseText);
+function load_circuits_from_JSON(responseText) {
+    circuits = JSON.parse(responseText);
 
     select = document.getElementById('select_circuits');
     for (var name in circuits) {
@@ -167,13 +168,6 @@ function load_circuits_from_JSON() {
     // The default values
     circuit_url_from_js = "random";
     fname_circuit_url_from_js = "random";
-}
-
-function runscript(mirror) {
-    //read script
-    scriptLines = mirror.getValue();
-    //run script
-    pyodide.runPython(scriptLines);
 }
 
 function load_remote_file(url)

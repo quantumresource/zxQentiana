@@ -25,10 +25,12 @@ else:
     #Generate random circuit of Clifford gates
     qubit_amount = 10
     gate_count = 80
-    circuit = zx.generate.cliffordT(qubit_amount, gate_count)
+    from pyzx.generate import cliffordT
+    circuit = cliffordT(qubit_amount, gate_count)
 
 #Use one of the built-in rewriting strategies to simplify the circuit
-zx.simplify.full_reduce(circuit)
+from pyzx.simplify import full_reduce
+full_reduce(circuit)
 
 # Draw the circuit only if the ZX diagram is small enough not to kill the browser
 if (len(list(circuit.edges())) < 1000) and (len(list(circuit.vertices())) < 200):
@@ -39,7 +41,8 @@ else:
 my3DGraph.graphData(gjson)
 
 # Some information from the circuit
-t_count = zx.tcount(circuit)
+from pyzx.simplify import tcount
+t_count = tcount(circuit)
 max_log_qubits = circuit.qubit_count()
 cons.innerHTML += "<br> {} T gates, and {} qubits from pyZX ".format(t_count, max_log_qubits);
 
